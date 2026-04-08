@@ -1,0 +1,2 @@
+# Stockaholic
+Stockaholic is a basic stock management application developed as a school project. It allows users to keep track of inventory, manage stock levels, and organize products in a simple and efficient way. The goal of this project is to demonstrate fundamental concepts of application development, including data handling and API design.
