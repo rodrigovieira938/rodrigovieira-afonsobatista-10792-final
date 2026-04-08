@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Stockaholic_API.Controllers
+namespace Stockaholic.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
