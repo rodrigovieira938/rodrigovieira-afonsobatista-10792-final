@@ -1,0 +1,37 @@
+version: "3.8"
+
+# Production compose: builds/runs the API and a Postgres database
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: produser
+      POSTGRES_PASSWORD: prodpass
+      POSTGRES_DB: stockaholic
+    volumes:
+      - db_prod_data:/var/lib/postgresql/data
+    networks:
+      - stockaholic_net
+
+  api:
+    build:
+      context: ./Stockaholic.Api
+      dockerfile: Dockerfile
+    image: stockaholic-api:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    ports:
+      - "8000:80"
+    networks:
+      - stockaholic_net
+
+volumes:
+  db_prod_data:
+
+networks:
+  stockaholic_net:
+    driver: bridge
