@@ -1,5 +1,3 @@
-version: "3.8"
-
 # Production compose: builds/runs the API and a Postgres database
 services:
   db:

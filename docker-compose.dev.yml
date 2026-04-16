@@ -1,5 +1,3 @@
-version: "3.8"
-
 # Development compose: only a Postgres instance so you can run the API locally
 services:
   db:
