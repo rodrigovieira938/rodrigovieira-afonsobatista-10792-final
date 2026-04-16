@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Stockaholic.API.Data;
 using Stockaholic.API.Models;
-using Microsoft.AspNetCore.JsonPatch;
 
 namespace Stockaholic.API.Controllers
 {
