@@ -8,7 +8,8 @@ services:
       POSTGRES_PASSWORD: prodpass
       POSTGRES_DB: stockaholic
     volumes:
-      - db_prod_data:/var/lib/postgresql/data
+      - ./db_prod_data:/var/lib/postgresql/data
+      - ./scripts/postgres_init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - stockaholic_net
 

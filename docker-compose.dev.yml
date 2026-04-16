@@ -8,7 +8,8 @@ services:
       POSTGRES_PASSWORD: devpass
       POSTGRES_DB: stockaholic
     volumes:
-      - db_dev_data:/var/lib/postgresql/data
+      - ./db_dev_data:/var/lib/postgresql/data
+      - ./scripts/postgres_init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
 
