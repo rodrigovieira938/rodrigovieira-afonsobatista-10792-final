@@ -10,4 +10,8 @@ namespace Stockaholic.API.Models
         [Column("nome")]
         public string Nome { get; set; } = null!;
     }
+    public class CategoriaPatch
+    {
+        public string? Nome { get; set; } = null;
+    }
 }

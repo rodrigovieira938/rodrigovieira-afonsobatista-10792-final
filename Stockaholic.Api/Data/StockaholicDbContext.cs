@@ -8,5 +8,6 @@ namespace Stockaholic.API.Data
         {
 
         }
+        public DbSet<Models.Categoria> Categorias { get; set; }
     }
 }
