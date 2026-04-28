@@ -14,4 +14,8 @@ namespace Stockaholic.API.Models
     {
         public string? Nome { get; set; } = null;
     }
+    public class CreateCategoria
+    {
+        public string Nome { get; set; } = null!;
+    }
 }

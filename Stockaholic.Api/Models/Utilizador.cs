@@ -16,4 +16,18 @@ namespace Stockaholic.API.Models
         [Column("password_salt")]
         public string PasswordSalt { get; set; } = null!;
     }
+
+    public class UtilizadorPatch
+    {
+        public string? Nome { get; set; } = null;
+        public string? Email { get; set; } = null;
+        public string? PasswordHash { get; set; } = null;
+        public string? PasswordSalt { get; set; } = null;
+    }
+    public class CreateUtilizador
+    {
+        public string Nome { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string Password { get; set; } = null!;
+    }
 }

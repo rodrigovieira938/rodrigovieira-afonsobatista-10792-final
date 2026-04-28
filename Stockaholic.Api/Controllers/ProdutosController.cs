@@ -7,84 +7,86 @@ namespace Stockaholic.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class CategoriasController : ControllerBase
+    public class ProdutosController : ControllerBase
     {
         private readonly StockaholicDbContext _context;
-        public CategoriasController(StockaholicDbContext context)
+        public ProdutosController(StockaholicDbContext context)
         {
-            // Store the context in a private field for later use
             _context = context;
         }
 
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<Categoria>))]
-        public ActionResult<IEnumerable<Categoria>> Get()
+        [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<Produto>))]
+        public ActionResult<IEnumerable<Produto>> Get()
         {
-            return Ok(_context.Categorias.ToList());
+            return Ok(_context.Produtos.ToList());
         }
         [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(Categoria))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(Produto))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type=typeof(NotFoundResult))]
-        public ActionResult<Categoria> Get(int id)
+        public ActionResult<Produto> Get(int id)
         {
-            var categoria = _context.Categorias.Find(id);
-            if (categoria == null)
+            var produto = _context.Produtos.Find(id);
+            if (produto == null)
             {
                 return NotFound();
             }
-            return Ok(categoria);
+            return Ok(produto);
         }
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created, Type=typeof(Categoria))]
-        public ActionResult<Categoria> Post([FromBody] CreateCategoria createCategoria)
+        [ProducesResponseType(StatusCodes.Status201Created, Type=typeof(Produto))]
+        public ActionResult<Produto> Post([FromBody] CreateProduto createProduto)
         {
-            var categoria = new Categoria
+            var produto = new Produto
             {
-                Nome = createCategoria.Nome
+                Nome = createProduto.Nome,
+                CategoriaId = createProduto.CategoriaId
             };
-            _context.Categorias.Add(categoria);
+            _context.Produtos.Add(produto);
             _context.SaveChanges();
-            return CreatedAtAction(nameof(Get), new { id = categoria.Id }, categoria);
+            return CreatedAtAction(nameof(Get), new { id = produto.Id }, produto);
         }
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type=typeof(BadRequestResult))]
-        public ActionResult<Categoria> Put(int id, [FromBody] Categoria categoria)
+        public ActionResult<Produto> Put(int id, [FromBody] Produto produto)
         {
-            if (id != categoria.Id)
+            if (id != produto.Id)
             {
                 return BadRequest("O ID da URL deve ser igual ao ID do corpo da requisição.");
             }
-            _context.Entry(categoria).State = EntityState.Modified;
+            _context.Entry(produto).State = EntityState.Modified;
             _context.SaveChanges();
             return NoContent();
         }
         [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type=typeof(NotFoundResult))]
-        public ActionResult<Categoria> Patch(int id, [FromBody] CategoriaPatch input)
+        public ActionResult<Produto> Patch(int id, [FromBody] ProdutoPatch input)
         {
-            var categoria = _context.Categorias.Find(id);
-            if (categoria == null)
+            var produto = _context.Produtos.Find(id);
+            if (produto == null)
                 return NotFound();
 
             if (input.Nome != null)
-                categoria.Nome = input.Nome;
+                produto.Nome = input.Nome;
+            if (input.CategoriaId.HasValue)
+                produto.CategoriaId = input.CategoriaId.Value;
 
-            _context.Entry(categoria).State = EntityState.Modified;
+            _context.Entry(produto).State = EntityState.Modified;
             _context.SaveChanges();
             return NoContent();
         }
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type=typeof(NotFoundResult))]
-        public ActionResult<Categoria> Delete(int id)
+        public ActionResult<Produto> Delete(int id)
         {
-            var categoria = _context.Categorias.Find(id);
-            if (categoria == null)
+            var produto = _context.Produtos.Find(id);
+            if (produto == null)
                 return NotFound();
 
-            _context.Categorias.Remove(categoria);
+            _context.Produtos.Remove(produto);
             _context.SaveChanges();
             return NoContent();
         }
