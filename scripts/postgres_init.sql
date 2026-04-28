@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS produtos (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nome varchar(255) NOT NULL,
     categoria_id integer NOT NULL,
+    preco DECIMAL(10, 2) NOT NULL,
     CONSTRAINT fk_produto_categoria FOREIGN KEY (categoria_id)
         REFERENCES categorias (id)
         ON UPDATE CASCADE

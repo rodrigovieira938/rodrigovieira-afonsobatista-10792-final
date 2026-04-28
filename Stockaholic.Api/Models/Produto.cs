@@ -8,6 +8,8 @@ namespace Stockaholic.API.Models
     {
         [Column("id")]
         public int Id { get; set; }
+        [Column("preco")]
+        public float Preco { get; set; }
         [Column("nome")]
         public string Nome { get; set; } = null!;
         [Column("categoria_id")]
@@ -20,10 +22,12 @@ namespace Stockaholic.API.Models
     {
         public string? Nome { get; set; } = null;
         public int? CategoriaId { get; set; } = null;
+        public float? Preco { get; set; } = null;
     }
     public class CreateProduto
     {
         public string Nome { get; set; } = null!;
         public int CategoriaId { get; set; }
+        public float Preco { get; set; }
     }
 }

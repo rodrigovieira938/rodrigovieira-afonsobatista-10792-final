@@ -40,7 +40,8 @@ namespace Stockaholic.API.Controllers
             var produto = new Produto
             {
                 Nome = createProduto.Nome,
-                CategoriaId = createProduto.CategoriaId
+                CategoriaId = createProduto.CategoriaId,
+                Preco = createProduto.Preco
             };
             _context.Produtos.Add(produto);
             _context.SaveChanges();
@@ -70,8 +71,11 @@ namespace Stockaholic.API.Controllers
 
             if (input.Nome != null)
                 produto.Nome = input.Nome;
-            if (input.CategoriaId.HasValue)
+            if (input.CategoriaId != null)
                 produto.CategoriaId = input.CategoriaId.Value;
+            if (input.Preco != null)
+                produto.Preco = input.Preco.Value;
+
 
             _context.Entry(produto).State = EntityState.Modified;
             _context.SaveChanges();
