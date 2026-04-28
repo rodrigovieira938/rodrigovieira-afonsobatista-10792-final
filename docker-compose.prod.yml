@@ -24,7 +24,8 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
     ports:
-      - "8000:80"
+      - "8000:8000"
+      - "4343:4343"
     networks:
       - stockaholic_net
 
