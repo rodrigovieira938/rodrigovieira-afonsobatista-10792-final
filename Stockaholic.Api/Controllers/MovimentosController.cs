@@ -33,6 +33,57 @@ namespace Stockaholic.API.Controllers
             }
             return Ok(movimento);
         }
+        [HttpGet("recentes")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<Movimento>))]
+        public ActionResult<IEnumerable<Movimento>> GetRecentes()
+        {
+            var recentes = _context.Movimentos
+                .OrderByDescending(m => m.Timestamp)
+                .Take(8)
+                .ToList();
+            return Ok(recentes);
+        }
+        [HttpGet("hoje")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<Movimento>))]
+        public ActionResult<IEnumerable<Movimento>> GetHoje()
+        {            var hoje = DateTime.UtcNow.Date;
+            var movimentosHoje = _context.Movimentos
+                .Where(m => m.Timestamp.Date == hoje)
+                .ToList();
+            return Ok(movimentosHoje);
+        }
+        [HttpGet("stock")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<ProdutoStock>))]
+        public ActionResult<IEnumerable<ProdutoStock>> GetStock()
+        {
+            var res = _context.Movimentos.GroupBy(m => m.ProdutoId)
+                .Select(g => new ProdutoStock
+                {
+                    ProdutoId = g.Key,
+                    Nome = _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.Nome).FirstOrDefault() ?? "",
+                    Quantidade = g.Sum(m => m.Delta),
+                    Valor = g.Sum(m => m.Delta) * _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.Preco).FirstOrDefault()
+                })
+                .ToList();
+            return Ok(res);
+        }
+        [HttpGet("top-valor")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<ProdutoStock>))]
+        public ActionResult<IEnumerable<ProdutoStock>> GetTopValor()
+        {
+            var res = _context.Movimentos.GroupBy(m => m.ProdutoId)
+                .Select(g => new ProdutoStock
+                {
+                    ProdutoId = g.Key,
+                    Nome = _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.Nome).FirstOrDefault() ?? "",
+                    Quantidade = g.Sum(m => m.Delta),
+                    Valor = g.Sum(m => m.Delta) * _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.Preco).FirstOrDefault()
+                })
+                .OrderByDescending(ps => ps.Valor)
+                .Take(8)
+                .ToList();
+            return Ok(res);
+        }
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type=typeof(Movimento))]
         public ActionResult<Movimento> Post([FromBody] CreateMovimento createMovimento)
