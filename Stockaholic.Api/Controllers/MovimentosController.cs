@@ -62,7 +62,7 @@ namespace Stockaholic.API.Controllers
                     ProdutoId = g.Key,
                     Nome = _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.Nome).FirstOrDefault() ?? "",
                     Quantidade = g.Sum(m => m.Delta),
-                    Valor = g.Sum(m => m.Delta) * _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.Preco).FirstOrDefault()
+                    ValorTotal = g.Sum(m => m.Delta) * _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.Preco).FirstOrDefault()
                 })
                 .ToList();
             return Ok(res);
@@ -77,9 +77,9 @@ namespace Stockaholic.API.Controllers
                     ProdutoId = g.Key,
                     Nome = _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.Nome).FirstOrDefault() ?? "",
                     Quantidade = g.Sum(m => m.Delta),
-                    Valor = g.Sum(m => m.Delta) * _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.Preco).FirstOrDefault()
+                    ValorTotal = g.Sum(m => m.Delta) * _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.Preco).FirstOrDefault()
                 })
-                .OrderByDescending(ps => ps.Valor)
+                .OrderByDescending(ps => ps.ValorTotal)
                 .Take(8)
                 .ToList();
             return Ok(res);
