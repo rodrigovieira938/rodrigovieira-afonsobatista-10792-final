@@ -90,8 +90,24 @@
         <nav class="flex-1 p-3 flex flex-col gap-0.5">
             <p class="font-mono text-muted px-2 pt-3 pb-1.5"
                 style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase">Main</p>
-            <a href="dashboard.html"
-                class="nav-active flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm cursor-pointer">
+            @if (ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" &&
+                ViewContext.RouteData.Values["action"]?.ToString() == "Index")
+            {
+                <a asp-controller="Dashboard" asp-action="Index"
+                    class="nav-active flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm cursor-pointer">
+                    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                        <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                    Dashboard
+                </a>
+            } else {
+                <a asp-controller="Dashboard" asp-action="Index"
+                class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-muted hover:bg-surface2 hover:text-white transition-all cursor-pointer"
+                style="border:1px solid transparent">
                 <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2">
                     <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -101,51 +117,111 @@
                 </svg>
                 Dashboard
             </a>
-            <a href="produtos.html"
-                class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-muted hover:bg-surface2 hover:text-white transition-all cursor-pointer"
-                style="border:1px solid transparent">
-                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            }
+            @if (ViewContext.RouteData.Values["controller"]?.ToString() == "Produtos" &&
+                ViewContext.RouteData.Values["action"]?.ToString() == "Index")
+            {
+                <a asp-controller="Produtos" asp-action="Index"
+                    class="nav-active flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm cursor-pointer">
+                    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    </svg>
+                    Produtos
+                </a>
+            } else {
+                <a asp-controller="Produtos" asp-action="Index"
+                    class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-muted hover:bg-surface2 hover:text-white transition-all cursor-pointer"
+                    style="border:1px solid transparent">
+                    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    </svg>
+                    Produtos
+                </a>
+            }
+            @if (ViewContext.RouteData.Values["controller"]?.ToString() == "Movimentos" &&
+                ViewContext.RouteData.Values["action"]?.ToString() == "Index")
+            {
+                <a asp-controller="Movimentos" asp-action="Index"
+                    class="nav-active flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm cursor-pointer">
+                    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2">
-                    <path
-                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                </svg>
-                Produtos
-            </a>
-            <a href="movimentos.html"
-                class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-muted hover:bg-surface2 hover:text-white transition-all cursor-pointer"
-                style="border:1px solid transparent">
-                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        <path d="M17 3l4 4-4 4" />
+                        <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                        <path d="M7 21l-4-4 4-4" />
+                        <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                    </svg>
+                    Movimentos
+                </a>
+            } else {
+                <a asp-controller="Movimentos" asp-action="Index"
+                    class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-muted hover:bg-surface2 hover:text-white transition-all cursor-pointer"
+                    style="border:1px solid transparent">
+                    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M17 3l4 4-4 4" />
+                        <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                        <path d="M7 21l-4-4 4-4" />
+                        <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                    </svg>
+                    Movimentos
+                </a>
+            }
+            @if (ViewContext.RouteData.Values["controller"]?.ToString() == "Categorias" &&
+                ViewContext.RouteData.Values["action"]?.ToString() == "Index")
+            {
+                <a asp-controller="Categorias" asp-action="Index"
+                    class="nav-active flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm cursor-pointer">
+                    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2">
-                    <path d="M17 3l4 4-4 4" />
-                    <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-                    <path d="M7 21l-4-4 4-4" />
-                    <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-                </svg>
-                Movimentos
-            </a>
-            <a href="categorias.html"
-                class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-muted hover:bg-surface2 hover:text-white transition-all cursor-pointer"
-                style="border:1px solid transparent">
-                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        <path d="M4 6h16M4 12h10M4 18h6" />
+                    </svg>
+                    Categorias
+                </a>
+            } else {
+                <a asp-controller="Categorias" asp-action="Index"
+                    class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-muted hover:bg-surface2 hover:text-white transition-all cursor-pointer"
+                    style="border:1px solid transparent">
+                    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2">
-                    <path d="M4 6h16M4 12h10M4 18h6" />
-                </svg>
-                Categorias
-            </a>
+                        <path d="M4 6h16M4 12h10M4 18h6" />
+                    </svg>
+                    Categorias
+                </a>
+            }
             <p class="font-mono text-muted px-2 pt-3 pb-1.5"
                 style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase">Admin</p>
-            <a href="utilizadores.html"
-                class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-muted hover:bg-surface2 hover:text-white transition-all cursor-pointer"
-                style="border:1px solid transparent">
-                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
-                Utilizadores
-            </a>
+            @if (ViewContext.RouteData.Values["controller"]?.ToString() == "Utilizadores" &&
+                ViewContext.RouteData.Values["action"]?.ToString() == "Index")
+            {
+                <a asp-controller="Utilizadores" asp-action="Index"
+                    class="nav-active flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm cursor-pointer">
+                    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                    Utilizadores
+                </a>
+            } else {
+                <a asp-controller="Utilizadores" asp-action="Index"
+                    class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-muted hover:bg-surface2 hover:text-white transition-all cursor-pointer"
+                    style="border:1px solid transparent">
+                    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                    Utilizadores
+                </a>
+            }
         </nav>
 
         <div class="p-3" style="border-top:1px solid rgba(255,255,255,0.07)">
