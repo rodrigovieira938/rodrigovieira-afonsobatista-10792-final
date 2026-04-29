@@ -1,0 +1,376 @@
+﻿@{
+    ViewData["Title"] = "Utilizadores";
+}
+
+<div class="flex-1 flex flex-col overflow-hidden">
+    <header class="px-7 py-4 flex items-center justify-between"
+      style="background:#13161f; border-bottom:1px solid rgba(255,255,255,0.07)">
+      <h1 class="text-base font-medium">Utilizadores</h1>
+      <button onclick="openModal()"
+        class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium text-bg bg-accent hover:opacity-90 transition-opacity">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        Novo Utilizador
+      </button>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-7 flex flex-col gap-4">
+
+      <!-- Summary pills -->
+      <div class="flex gap-3">
+        <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface"
+          style="border:1px solid rgba(255,255,255,0.07)">
+          <div class="w-2 h-2 rounded-full bg-danger"></div>
+          <span class="font-mono text-xs text-muted">Admins:</span>
+          <span class="font-mono text-xs text-danger font-medium" id="cnt-admin">0</span>
+        </div>
+        <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface"
+          style="border:1px solid rgba(255,255,255,0.07)">
+          <div class="w-2 h-2 rounded-full bg-accent3"></div>
+          <span class="font-mono text-xs text-muted">Gestores:</span>
+          <span class="font-mono text-xs text-accent3 font-medium" id="cnt-gestor">0</span>
+        </div>
+        <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface"
+          style="border:1px solid rgba(255,255,255,0.07)">
+          <div class="w-2 h-2 rounded-full bg-accent2"></div>
+          <span class="font-mono text-xs text-muted">Operadores:</span>
+          <span class="font-mono text-xs text-accent2 font-medium" id="cnt-op">0</span>
+        </div>
+        <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface"
+          style="border:1px solid rgba(255,255,255,0.07)">
+          <div class="w-2 h-2 rounded-full bg-accent"></div>
+          <span class="font-mono text-xs text-muted">Ativos:</span>
+          <span class="font-mono text-xs text-accent font-medium" id="cnt-active">0</span>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="flex items-center gap-3">
+        <div class="relative flex-1 max-w-xs">
+          <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted pointer-events-none"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input id="search" type="text" placeholder="Pesquisar utilizadores..."
+            class="w-full pl-8 pr-3 py-2 rounded-lg text-sm" oninput="renderTable()" />
+        </div>
+        <select id="filterRole" class="px-3 py-2 rounded-lg text-sm" onchange="renderTable()">
+          <option value="">Todos os papéis</option>
+          <option>Admin</option>
+          <option>Gestor</option>
+          <option>Operador</option>
+        </select>
+        <select id="filterStatus" class="px-3 py-2 rounded-lg text-sm" onchange="renderTable()">
+          <option value="">Todos os estados</option>
+          <option value="1">Ativo</option>
+          <option value="0">Inativo</option>
+        </select>
+        <span id="count" class="font-mono text-muted text-xs ml-auto"></span>
+      </div>
+
+      <!-- Table -->
+      <div class="bg-surface rounded-xl overflow-hidden" style="border:1px solid rgba(255,255,255,0.07)">
+        <table class="w-full border-collapse">
+          <thead style="background:#1e2334">
+            <tr>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">#</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Utilizador</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Email</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Papel</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Estado</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Último acesso
+              </th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <span id="page-info" class="font-mono text-muted text-xs"></span>
+        <div class="flex gap-1" id="pagination"></div>
+      </div>
+
+    </main>
+</div>
+
+  <!-- Create/Edit Modal -->
+  <div id="modal" class="fixed inset-0 flex items-center justify-center z-50 hidden" style="background:rgba(0,0,0,0.6)">
+    <div class="w-[440px] rounded-2xl overflow-hidden"
+      style="background:#13161f; border:1px solid rgba(255,255,255,0.1)">
+      <div class="px-6 py-5 flex items-center justify-between" style="border-bottom:1px solid rgba(255,255,255,0.07)">
+        <h2 id="modal-title" class="text-sm font-medium">Novo Utilizador</h2>
+        <button onclick="closeModal()" class="text-muted hover:text-white text-xl leading-none px-1">×</button>
+      </div>
+      <div class="p-6 flex flex-col gap-4">
+        <input type="hidden" id="edit-id" />
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Nome</label>
+            <input id="f-nome" type="text" placeholder="Nome completo" class="px-3 py-2 rounded-lg text-sm" />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Papel</label>
+            <select id="f-role" class="px-3 py-2 rounded-lg text-sm">
+              <option>Admin</option>
+              <option>Gestor</option>
+              <option>Operador</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Email</label>
+          <input id="f-email" type="email" placeholder="email@exemplo.com"
+            class="px-3 py-2 rounded-lg text-sm font-mono" />
+        </div>
+        <div id="pwd-section" class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Password</label>
+            <input id="f-pwd" type="password" placeholder="••••••••" class="px-3 py-2 rounded-lg text-sm" />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Confirmar
+              Password</label>
+            <input id="f-pwd2" type="password" placeholder="••••••••" class="px-3 py-2 rounded-lg text-sm" />
+          </div>
+        </div>
+        <div id="pwd-hint" class="hidden flex items-center gap-2">
+          <input type="checkbox" id="change-pwd" onchange="togglePwdSection()" class="w-3.5 h-3.5 accent-accent" />
+          <label for="change-pwd" class="text-xs text-muted">Alterar password</label>
+        </div>
+        <div id="pwd-mismatch" class="hidden px-3 py-2 rounded-lg text-xs text-danger font-mono"
+          style="background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.15)">
+          As passwords não coincidem.
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="f-active" checked class="w-3.5 h-3.5 accent-accent" />
+          <label for="f-active" class="text-xs text-muted">Utilizador ativo</label>
+        </div>
+      </div>
+      <div class="px-6 pb-6 flex gap-2 justify-end">
+        <button onclick="closeModal()" class="px-4 py-2 rounded-lg text-xs font-medium text-muted"
+          style="background:#1e2334; border:1px solid rgba(255,255,255,0.07)">Cancelar</button>
+        <button onclick="saveUtilizador()"
+          class="px-4 py-2 rounded-lg text-xs font-medium text-bg bg-accent hover:opacity-90">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete confirm -->
+  <div id="del-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden"
+    style="background:rgba(0,0,0,0.6)">
+    <div class="w-80 rounded-2xl overflow-hidden" style="background:#13161f; border:1px solid rgba(255,255,255,0.1)">
+      <div class="p-6">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center mb-4"
+          style="background:rgba(248,113,113,0.1)">
+          <svg class="w-5 h-5 text-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+        </div>
+        <h3 class="text-sm font-medium mb-1">Eliminar utilizador?</h3>
+        <p id="del-name" class="text-xs text-muted mb-5"></p>
+        <div class="flex gap-2 justify-end">
+          <button onclick="closeDelModal()" class="px-4 py-2 rounded-lg text-xs font-medium text-muted"
+            style="background:#1e2334; border:1px solid rgba(255,255,255,0.07)">Cancelar</button>
+          <button onclick="confirmDelete()" class="px-4 py-2 rounded-lg text-xs font-medium text-white"
+            style="background:#b91c1c">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+    function daysAgo(n) { const d = new Date(); d.setDate(d.getDate() - n); return d; }
+
+    const avatarColors = [
+      { bg: 'rgba(74,222,128,0.15)', color: '#4ade80' },
+      { bg: 'rgba(56,189,248,0.15)', color: '#38bdf8' },
+      { bg: 'rgba(245,158,11,0.15)', color: '#f59e0b' },
+      { bg: 'rgba(167,139,250,0.15)', color: '#a78bfa' },
+      { bg: 'rgba(244,114,182,0.15)', color: '#f472b6' },
+    ];
+
+    let utilizadores = [
+      { id: 1, nome: 'Admin', email: 'admin@stock.io', role: 'Admin', active: true, lastAccess: daysAgo(0) },
+      { id: 2, nome: 'João Silva', email: 'joao@stock.io', role: 'Gestor', active: true, lastAccess: daysAgo(1) },
+      { id: 3, nome: 'Maria Costa', email: 'maria@stock.io', role: 'Operador', active: true, lastAccess: daysAgo(0) },
+      { id: 4, nome: 'Pedro Santos', email: 'pedro@stock.io', role: 'Operador', active: false, lastAccess: daysAgo(14) },
+      { id: 5, nome: 'Ana Ferreira', email: 'ana@stock.io', role: 'Gestor', active: true, lastAccess: daysAgo(3) },
+      { id: 6, nome: 'Rui Lopes', email: 'rui@stock.io', role: 'Operador', active: false, lastAccess: daysAgo(30) },
+    ];
+
+    let nextId = 7, page = 1, perPage = 8, delTarget = null;
+
+    function initials(nome) { return nome.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase(); }
+    function avatarStyle(id) { const s = avatarColors[(id - 1) % avatarColors.length]; return `background:${s.bg}; color:${s.color}`; }
+
+    function formatDate(d) {
+      const now = new Date(); now.setHours(0, 0, 0, 0);
+      const dd = new Date(d); dd.setHours(0, 0, 0, 0);
+      const diff = Math.round((now - dd) / 86400000);
+      if (diff === 0) return 'Hoje';
+      if (diff === 1) return 'Ontem';
+      if (diff < 7) return `${diff} dias atrás`;
+      return d.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function filtered() {
+      const q = document.getElementById('search').value.toLowerCase();
+      const role = document.getElementById('filterRole').value;
+      const status = document.getElementById('filterStatus').value;
+      return utilizadores.filter(u => {
+        const mq = u.nome.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
+        const mr = !role || u.role === role;
+        const ms = status === '' || (status === '1' ? u.active : !u.active);
+        return mq && mr && ms;
+      });
+    }
+
+    function renderTable() {
+      document.getElementById('cnt-admin').textContent = utilizadores.filter(u => u.role === 'Admin').length;
+      document.getElementById('cnt-gestor').textContent = utilizadores.filter(u => u.role === 'Gestor').length;
+      document.getElementById('cnt-op').textContent = utilizadores.filter(u => u.role === 'Operador').length;
+      document.getElementById('cnt-active').textContent = utilizadores.filter(u => u.active).length;
+
+      const data = filtered();
+      const total = data.length;
+      const totalPages = Math.ceil(total / perPage);
+      if (page > totalPages) page = 1;
+      const slice = data.slice((page - 1) * perPage, page * perPage);
+
+      document.getElementById('count').textContent = `${total} utilizador${total !== 1 ? 'es' : ''}`;
+      document.getElementById('page-info').textContent = `Página ${page} de ${Math.max(1, totalPages)}`;
+
+      document.getElementById('tbody').innerHTML = slice.map(u => {
+        const roleClass = u.role === 'Admin' ? 'role-admin' : u.role === 'Gestor' ? 'role-gestor' : 'role-operador';
+        const statusClass = u.active ? 'status-on' : 'status-off';
+        const statusLabel = u.active ? 'Ativo' : 'Inativo';
+        return `
+        <tr class="hover:bg-surface2 transition-colors" style="border-bottom:1px solid rgba(255,255,255,0.05)">
+          <td class="px-4 py-3 font-mono text-muted" style="font-size:11px">#${u.id}</td>
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0" style="${avatarStyle(u.id)}">${initials(u.nome)}</div>
+              <span class="text-sm font-medium">${u.nome}</span>
+            </div>
+          </td>
+          <td class="px-4 py-3 font-mono text-muted text-xs">${u.email}</td>
+          <td class="px-4 py-3"><span class="font-mono px-2 py-0.5 rounded text-xs ${roleClass}">${u.role}</span></td>
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-2">
+              <span class="font-mono px-2 py-0.5 rounded text-xs ${statusClass}">${statusLabel}</span>
+            </div>
+          </td>
+          <td class="px-4 py-3 font-mono text-muted" style="font-size:11px">${formatDate(u.lastAccess)}</td>
+          <td class="px-4 py-3">
+            <div class="flex gap-2">
+              <button onclick="toggleActive(${u.id})" class="px-2.5 py-1 rounded-md text-xs font-mono transition-colors" style="background:#1e2334; border:1px solid rgba(255,255,255,0.07); color:#6b7280">${u.active ? 'desativar' : 'ativar'}</button>
+              <button onclick="editUtilizador(${u.id})" class="px-2.5 py-1 rounded-md text-xs font-mono" style="background:#1e2334; border:1px solid rgba(255,255,255,0.07); color:#e8eaf0">editar</button>
+              <button onclick="deleteUtilizador(${u.id})" class="px-2.5 py-1 rounded-md text-xs font-mono" style="background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.15); color:#f87171">eliminar</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+
+      const pag = document.getElementById('pagination');
+      pag.innerHTML = '';
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = 'w-7 h-7 rounded-md font-mono text-xs transition-all';
+        btn.style.cssText = i === page
+          ? 'background:rgba(74,222,128,0.1);color:#4ade80;border:1px solid rgba(74,222,128,0.3)'
+          : 'background:#1e2334;color:#6b7280;border:1px solid rgba(255,255,255,0.07)';
+        btn.onclick = () => { page = i; renderTable(); };
+        pag.appendChild(btn);
+      }
+    }
+
+    function toggleActive(id) {
+      const u = utilizadores.find(u => u.id === id);
+      u.active = !u.active;
+      renderTable();
+    }
+
+    function openModal(u = null) {
+      const isEdit = !!u;
+      document.getElementById('edit-id').value = u ? u.id : '';
+      document.getElementById('modal-title').textContent = u ? 'Editar Utilizador' : 'Novo Utilizador';
+      document.getElementById('f-nome').value = u ? u.nome : '';
+      document.getElementById('f-email').value = u ? u.email : '';
+      document.getElementById('f-role').value = u ? u.role : 'Operador';
+      document.getElementById('f-active').checked = u ? u.active : true;
+      document.getElementById('f-pwd').value = '';
+      document.getElementById('f-pwd2').value = '';
+      document.getElementById('pwd-mismatch').classList.add('hidden');
+
+      // On edit: show checkbox to optionally change pwd; on create: always show pwd fields
+      if (isEdit) {
+        document.getElementById('pwd-section').classList.add('hidden');
+        document.getElementById('pwd-hint').classList.remove('hidden');
+        document.getElementById('change-pwd').checked = false;
+      } else {
+        document.getElementById('pwd-section').classList.remove('hidden');
+        document.getElementById('pwd-hint').classList.add('hidden');
+      }
+
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function togglePwdSection() {
+      const show = document.getElementById('change-pwd').checked;
+      document.getElementById('pwd-section').classList.toggle('hidden', !show);
+    }
+
+    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+    function editUtilizador(id) { openModal(utilizadores.find(u => u.id === id)); }
+
+    function saveUtilizador() {
+      const id = document.getElementById('edit-id').value;
+      const nome = document.getElementById('f-nome').value.trim();
+      const email = document.getElementById('f-email').value.trim();
+      const role = document.getElementById('f-role').value;
+      const active = document.getElementById('f-active').checked;
+      const pwd = document.getElementById('f-pwd').value;
+      const pwd2 = document.getElementById('f-pwd2').value;
+      const changePwd = !id || document.getElementById('change-pwd').checked;
+
+      document.getElementById('pwd-mismatch').classList.add('hidden');
+      if (!nome || !email) return;
+      if (changePwd && pwd !== pwd2) {
+        document.getElementById('pwd-mismatch').classList.remove('hidden');
+        return;
+      }
+
+      if (id) {
+        const u = utilizadores.find(u => u.id == id);
+        Object.assign(u, { nome, email, role, active });
+      } else {
+        utilizadores.push({ id: nextId++, nome, email, role, active, lastAccess: new Date() });
+      }
+      closeModal(); renderTable();
+    }
+
+    function deleteUtilizador(id) {
+      delTarget = id;
+      const u = utilizadores.find(u => u.id === id);
+      document.getElementById('del-name').textContent = `"${u.nome}" (${u.email}) será removido permanentemente.`;
+      document.getElementById('del-modal').classList.remove('hidden');
+    }
+    function closeDelModal() { document.getElementById('del-modal').classList.add('hidden'); delTarget = null; }
+    function confirmDelete() { utilizadores = utilizadores.filter(u => u.id !== delTarget); closeDelModal(); renderTable(); }
+
+    renderTable();
+  </script>

@@ -1,0 +1,128 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="flex-1 flex flex-col overflow-hidden">
+    <!-- Topbar -->
+    <header class="px-7 py-4 flex items-center justify-between"
+      style="background:#13161f; border-bottom:1px solid rgba(255,255,255,0.07)">
+      <h1 class="text-base font-medium">Dashboard</h1>
+    </header>
+
+    <!-- Content -->
+    <main class="flex-1 overflow-y-auto p-7 flex flex-col gap-5">
+
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-3 gap-3.5">
+        <div class="bg-surface rounded-xl p-5 relative overflow-hidden" style="border:1px solid rgba(255,255,255,0.07)">
+          <div class="absolute top-0 left-0 right-0 h-0.5 bg-accent"></div>
+          <p class="font-mono text-muted uppercase tracking-wider mb-2.5" style="font-size:10px">Total Produtos</p>
+          <p class="text-3xl font-bold text-accent leading-none mb-2">148</p>
+          <p class="text-xs text-muted flex items-center gap-1"><span class="text-accent">↑ 12</span> este mês</p>
+        </div>
+        <div class="bg-surface rounded-xl p-5 relative overflow-hidden" style="border:1px solid rgba(255,255,255,0.07)">
+          <div class="absolute top-0 left-0 right-0 h-0.5 bg-accent2"></div>
+          <p class="font-mono text-muted uppercase tracking-wider mb-2.5" style="font-size:10px">Valor em Stock</p>
+          <p class="text-3xl font-bold text-accent2 leading-none mb-2">€24.8k</p>
+          <p class="text-xs text-muted flex items-center gap-1"><span class="text-accent">↑ 8.3%</span> vs mês ant.</p>
+        </div>
+        <div class="bg-surface rounded-xl p-5 relative overflow-hidden" style="border:1px solid rgba(255,255,255,0.07)">
+          <div class="absolute top-0 left-0 right-0 h-0.5 bg-accent3"></div>
+          <p class="font-mono text-muted uppercase tracking-wider mb-2.5" style="font-size:10px">Movimentos Hoje</p>
+          <p class="text-3xl font-bold text-accent3 leading-none mb-2">37</p>
+          <p class="text-xs text-muted flex items-center gap-1"><span class="text-danger">↓ 4</span> vs ontem</p>
+        </div>
+      </div>
+
+      <!-- Two panels -->
+      <div class="grid grid-cols-2 gap-3.5">
+
+        <!-- Recent Movements -->
+        <div class="bg-surface rounded-xl overflow-hidden" style="border:1px solid rgba(255,255,255,0.07)">
+          <div class="px-5 py-4 flex items-center justify-between"
+            style="border-bottom:1px solid rgba(255,255,255,0.07)">
+            <h3 class="text-sm font-medium">Movimentos Recentes</h3>
+            <span class="font-mono text-muted bg-surface2 px-2 py-0.5 rounded text-xs">hoje</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-3 px-5 py-3 hover:bg-surface2 transition-colors cursor-default">
+              <div class="w-2 h-2 rounded-full bg-accent flex-shrink-0"></div>
+              <div class="flex-1">
+                <p class="text-xs font-medium">Papel A4 500fls</p>
+                <p class="font-mono text-muted" style="font-size:10px">14:32 · Armazém A</p>
+              </div>
+              <span class="font-mono text-accent text-sm font-medium">+120</span>
+            </div>
+            <div class="flex items-center gap-3 px-5 py-3 hover:bg-surface2 transition-colors cursor-default">
+              <div class="w-2 h-2 rounded-full bg-danger flex-shrink-0"></div>
+              <div class="flex-1">
+                <p class="text-xs font-medium">Canetas Bic Azul</p>
+                <p class="font-mono text-muted" style="font-size:10px">13:15 · Expedição</p>
+              </div>
+              <span class="font-mono text-danger text-sm font-medium">−48</span>
+            </div>
+            <div class="flex items-center gap-3 px-5 py-3 hover:bg-surface2 transition-colors cursor-default">
+              <div class="w-2 h-2 rounded-full bg-accent flex-shrink-0"></div>
+              <div class="flex-1">
+                <p class="text-xs font-medium">Dossiers A4</p>
+                <p class="font-mono text-muted" style="font-size:10px">11:50 · Armazém B</p>
+              </div>
+              <span class="font-mono text-accent text-sm font-medium">+60</span>
+            </div>
+            <div class="flex items-center gap-3 px-5 py-3 hover:bg-surface2 transition-colors cursor-default">
+              <div class="w-2 h-2 rounded-full bg-danger flex-shrink-0"></div>
+              <div class="flex-1">
+                <p class="text-xs font-medium">Post-it 76x76</p>
+                <p class="font-mono text-muted" style="font-size:10px">10:28 · Loja</p>
+              </div>
+              <span class="font-mono text-danger text-sm font-medium">−24</span>
+            </div>
+            <div class="flex items-center gap-3 px-5 py-3 hover:bg-surface2 transition-colors cursor-default">
+              <div class="w-2 h-2 rounded-full bg-danger flex-shrink-0"></div>
+              <div class="flex-1">
+                <p class="text-xs font-medium">Clips 50mm cx100</p>
+                <p class="font-mono text-muted" style="font-size:10px">09:05 · Expedição</p>
+              </div>
+              <span class="font-mono text-danger text-sm font-medium">−200</span>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- Bar chart -->
+        <div class="bg-surface rounded-xl overflow-hidden" style="border:1px solid rgba(255,255,255,0.07)">
+          <div class="px-5 py-4 flex items-center justify-between"
+            style="border-bottom:1px solid rgba(255,255,255,0.07)">
+            <h3 class="text-sm font-medium">Top Produtos por Valor em Stock</h3>
+            <span class="font-mono text-muted bg-surface2 px-2 py-0.5 rounded text-xs">top 5</span>
+          </div>
+          <div class="p-5 flex flex-col gap-3" id="bar-chart"></div>
+        </div>
+
+    </main>
+</div>
+<script>
+    const products = [
+      { name: 'Toner HP 85A', value: 4200, color: '#38bdf8' },
+      { name: 'Papel A4 Resma', value: 3100, color: '#4ade80' },
+      { name: 'Dossiers A4 Lux', value: 2400, color: '#4ade80' },
+      { name: 'Cartuchos Epson', value: 1800, color: '#f59e0b' },
+      { name: 'Fita Laminadora', value: 1200, color: '#38bdf8' },
+    ];
+    const max = products[0].value;
+    const chart = document.getElementById('bar-chart');
+    chart.innerHTML = products.map(p => `
+      <div style="display:flex; align-items:center; gap:10px">
+        <span style="font-family:'DM Mono',monospace; font-size:11px; color:#6b7280; width:110px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${p.name}</span>
+        <div style="flex:1; height:6px; background:#1e2334; border-radius:3px; overflow:hidden">
+          <div class="bar-fill" data-w="${Math.round(p.value / max * 100)}" style="height:100%; width:0%; border-radius:3px; background:${p.color}"></div>
+        </div>
+        <span style="font-family:'DM Mono',monospace; font-size:11px; color:#6b7280; width:40px; text-align:right">€${(p.value / 1000).toFixed(1)}k</span>
+      </div>
+    `).join('');
+
+    setTimeout(() => {
+      document.querySelectorAll('.bar-fill').forEach(b => b.style.width = b.dataset.w + '%');
+    }, 100);
+</script>

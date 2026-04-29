@@ -1,0 +1,339 @@
+@{
+    ViewData["Title"] = "Movimentos";
+}
+
+<div class="flex-1 flex flex-col overflow-hidden">
+    <header class="px-7 py-4 flex items-center justify-between"
+      style="background:#13161f; border-bottom:1px solid rgba(255,255,255,0.07)">
+      <h1 class="text-base font-medium">Movimentos</h1>
+      <button onclick="openModal()"
+        class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium text-bg bg-accent hover:opacity-90 transition-opacity">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        Novo Movimento
+      </button>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-7 flex flex-col gap-4">
+
+      <!-- Summary pills -->
+      <div class="flex gap-3">
+        <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface"
+          style="border:1px solid rgba(255,255,255,0.07)">
+          <div class="w-2 h-2 rounded-full bg-accent"></div>
+          <span class="font-mono text-xs text-muted">Entradas hoje:</span>
+          <span class="font-mono text-xs text-accent font-medium" id="sum-in">0</span>
+        </div>
+        <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface"
+          style="border:1px solid rgba(255,255,255,0.07)">
+          <div class="w-2 h-2 rounded-full bg-danger"></div>
+          <span class="font-mono text-xs text-muted">Saídas hoje:</span>
+          <span class="font-mono text-xs text-danger font-medium" id="sum-out">0</span>
+        </div>
+        <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface"
+          style="border:1px solid rgba(255,255,255,0.07)">
+          <div class="w-2 h-2 rounded-full bg-accent3"></div>
+          <span class="font-mono text-xs text-muted">Total movimentos:</span>
+          <span class="font-mono text-xs text-accent3 font-medium" id="sum-total">0</span>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="flex items-center gap-3">
+        <div class="relative flex-1 max-w-xs">
+          <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted pointer-events-none"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input id="search" type="text" placeholder="Pesquisar..." class="w-full pl-8 pr-3 py-2 rounded-lg text-sm"
+            oninput="renderTable()" />
+        </div>
+        <select id="filterTipo" class="px-3 py-2 rounded-lg text-sm" onchange="renderTable()">
+          <option value="">Todos os tipos</option>
+          <option>Entrada</option>
+          <option>Saída</option>
+          <option>Ajuste</option>
+          <option>Devolução</option>
+        </select>
+        <input id="filterDate" type="date" class="px-3 py-2 rounded-lg text-sm font-mono" onchange="renderTable()" />
+        <span id="count" class="font-mono text-muted text-xs ml-auto"></span>
+      </div>
+
+      <!-- Table -->
+      <div class="bg-surface rounded-xl overflow-hidden" style="border:1px solid rgba(255,255,255,0.07)">
+        <table class="w-full border-collapse">
+          <thead style="background:#1e2334">
+            <tr>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">#</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Nome</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Tipo</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Produto</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Delta</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Utilizador</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Data</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <span id="page-info" class="font-mono text-muted text-xs"></span>
+        <div class="flex gap-1" id="pagination"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="fixed inset-0 flex items-center justify-center z-50 hidden" style="background:rgba(0,0,0,0.6)">
+    <div class="w-[460px] rounded-2xl overflow-hidden"
+      style="background:#13161f; border:1px solid rgba(255,255,255,0.1)">
+      <div class="px-6 py-5 flex items-center justify-between" style="border-bottom:1px solid rgba(255,255,255,0.07)">
+        <h2 id="modal-title" class="text-sm font-medium">Novo Movimento</h2>
+        <button onclick="closeModal()" class="text-muted hover:text-white text-xl leading-none px-1">×</button>
+      </div>
+      <div class="p-6 flex flex-col gap-4">
+        <input type="hidden" id="edit-id" />
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Nome</label>
+            <input id="f-nome" type="text" placeholder="Nome do movimento" class="px-3 py-2 rounded-lg text-sm" />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Tipo</label>
+            <select id="f-tipo" class="px-3 py-2 rounded-lg text-sm" onchange="syncDelta()">
+              <option>Entrada</option>
+              <option>Saída</option>
+              <option>Ajuste</option>
+              <option>Devolução</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Produto</label>
+            <select id="f-produto" class="px-3 py-2 rounded-lg text-sm">
+              <option>Papel A4 500fls</option>
+              <option>Toner HP 85A</option>
+              <option>Canetas Bic Azul</option>
+              <option>Dossiers A4 Lux</option>
+              <option>Envelopes DL</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Delta
+              (quantidade)</label>
+            <input id="f-delta" type="number" placeholder="ex: 50" class="px-3 py-2 rounded-lg text-sm font-mono" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Utilizador</label>
+            <select id="f-user" class="px-3 py-2 rounded-lg text-sm">
+              <option>Admin</option>
+              <option>João Silva</option>
+              <option>Maria Costa</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Timestamp</label>
+            <input id="f-ts" type="datetime-local" class="px-3 py-2 rounded-lg text-sm font-mono" />
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Descrição
+            (opcional)</label>
+          <textarea id="f-desc" rows="2" placeholder="Notas adicionais..."
+            class="px-3 py-2 rounded-lg text-sm resize-none"></textarea>
+        </div>
+      </div>
+      <div class="px-6 pb-6 flex gap-2 justify-end">
+        <button onclick="closeModal()" class="px-4 py-2 rounded-lg text-xs font-medium text-muted"
+          style="background:#1e2334; border:1px solid rgba(255,255,255,0.07)">Cancelar</button>
+        <button onclick="saveMovimento()"
+          class="px-4 py-2 rounded-lg text-xs font-medium text-bg bg-accent hover:opacity-90">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete confirm -->
+  <div id="del-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden"
+    style="background:rgba(0,0,0,0.6)">
+    <div class="w-80 rounded-2xl overflow-hidden" style="background:#13161f; border:1px solid rgba(255,255,255,0.1)">
+      <div class="p-6">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center mb-4"
+          style="background:rgba(248,113,113,0.1)">
+          <svg class="w-5 h-5 text-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+        </div>
+        <h3 class="text-sm font-medium mb-1">Eliminar movimento?</h3>
+        <p id="del-name" class="text-xs text-muted mb-5"></p>
+        <div class="flex gap-2 justify-end">
+          <button onclick="closeDelModal()" class="px-4 py-2 rounded-lg text-xs font-medium text-muted"
+            style="background:#1e2334; border:1px solid rgba(255,255,255,0.07)">Cancelar</button>
+          <button onclick="confirmDelete()" class="px-4 py-2 rounded-lg text-xs font-medium text-white"
+            style="background:#b91c1c">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+    const tipoStyle = {
+      'Entrada': { bg: 'rgba(74,222,128,0.1)', color: '#4ade80' },
+      'Saída': { bg: 'rgba(248,113,113,0.1)', color: '#f87171' },
+      'Ajuste': { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b' },
+      'Devolução': { bg: 'rgba(56,189,248,0.1)', color: '#38bdf8' },
+    };
+
+    const now = new Date();
+    function ts(h, m, daysAgo = 0) {
+      const d = new Date(now); d.setDate(d.getDate() - daysAgo); d.setHours(h, m, 0, 0); return d;
+    }
+
+    let movimentos = [
+      { id: 1, nome: 'Reposição semanal', tipo: 'Entrada', produto: 'Papel A4 500fls', delta: 120, user: 'Admin', ts: ts(14, 32), desc: 'Entrega fornecedor' },
+      { id: 2, nome: 'Venda loja', tipo: 'Saída', produto: 'Canetas Bic Azul', delta: -48, user: 'João Silva', ts: ts(13, 15), desc: '' },
+      { id: 3, nome: 'Stock inicial', tipo: 'Entrada', produto: 'Dossiers A4 Lux', delta: 60, user: 'Admin', ts: ts(11, 50), desc: 'Abertura armazém' },
+      { id: 4, nome: 'Consumo interno', tipo: 'Saída', produto: 'Post-it 76x76', delta: -24, user: 'Maria Costa', ts: ts(10, 28), desc: '' },
+      { id: 5, nome: 'Correção inventário', tipo: 'Ajuste', produto: 'Toner HP 85A', delta: -2, user: 'Admin', ts: ts(9, 5), desc: 'Diferença contagem' },
+      { id: 6, nome: 'Devolução cliente', tipo: 'Devolução', produto: 'Envelopes DL', delta: 10, user: 'João Silva', ts: ts(8, 30, 1), desc: '' },
+      { id: 7, nome: 'Reposição mensal', tipo: 'Entrada', produto: 'Toner HP 85A', delta: 20, user: 'Admin', ts: ts(15, 0, 1), desc: 'Encomenda mensal' },
+      { id: 8, nome: 'Expedição', tipo: 'Saída', produto: 'Papel A4 500fls', delta: -80, user: 'Maria Costa', ts: ts(11, 0, 1), desc: 'Cliente XYZ' },
+      { id: 9, nome: 'Ajuste pós-inventário', tipo: 'Ajuste', produto: 'Canetas Bic Azul', delta: 5, user: 'Admin', ts: ts(16, 0, 2), desc: '' },
+      { id: 10, nome: 'Entrada fornecedor', tipo: 'Entrada', produto: 'Envelopes DL', delta: 500, user: 'João Silva', ts: ts(9, 0, 2), desc: 'NF 2024/001' },
+    ];
+    let nextId = 11, page = 1, perPage = 8, delTarget = null;
+
+    function filtered() {
+      const q = document.getElementById('search').value.toLowerCase();
+      const tipo = document.getElementById('filterTipo').value;
+      const date = document.getElementById('filterDate').value;
+      return movimentos.filter(m => {
+        const matchQ = m.nome.toLowerCase().includes(q) || m.produto.toLowerCase().includes(q);
+        const matchTipo = !tipo || m.tipo === tipo;
+        const matchDate = !date || m.ts.toISOString().startsWith(date);
+        return matchQ && matchTipo && matchDate;
+      });
+    }
+
+    function renderTable() {
+      const data = filtered();
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const todayMov = movimentos.filter(m => { const d = new Date(m.ts); d.setHours(0, 0, 0, 0); return d.getTime() === today.getTime(); });
+      document.getElementById('sum-in').textContent = todayMov.filter(m => m.tipo === 'Entrada').reduce((a, m) => a + Math.abs(m.delta), 0);
+      document.getElementById('sum-out').textContent = todayMov.filter(m => m.tipo === 'Saída').reduce((a, m) => a + Math.abs(m.delta), 0);
+      document.getElementById('sum-total').textContent = movimentos.length;
+
+      const total = data.length;
+      const totalPages = Math.ceil(total / perPage);
+      if (page > totalPages) page = 1;
+      const slice = data.slice((page - 1) * perPage, page * perPage);
+      document.getElementById('count').textContent = `${total} movimento${total !== 1 ? 's' : ''}`;
+      document.getElementById('page-info').textContent = `Página ${page} de ${Math.max(1, totalPages)}`;
+
+      document.getElementById('tbody').innerHTML = slice.map(m => {
+        const s = tipoStyle[m.tipo] || {};
+        const deltaColor = m.delta > 0 ? '#4ade80' : m.delta < 0 ? '#f87171' : '#f59e0b';
+        const deltaStr = m.delta > 0 ? `+${m.delta}` : `${m.delta}`;
+        const dateStr = m.ts.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' });
+        const timeStr = m.ts.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+        return `
+        <tr class="hover:bg-surface2 transition-colors" style="border-bottom:1px solid rgba(255,255,255,0.05)">
+          <td class="px-4 py-3 font-mono text-muted" style="font-size:11px">#${m.id}</td>
+          <td class="px-4 py-3 text-sm font-medium">${m.nome}${m.desc ? `<p class='font-mono text-muted mt-0.5' style='font-size:10px'>${m.desc}</p>` : ''}</td>
+          <td class="px-4 py-3"><span class="font-mono px-2 py-0.5 rounded text-xs" style="background:${s.bg};color:${s.color}">${m.tipo}</span></td>
+          <td class="px-4 py-3 text-xs text-muted">${m.produto}</td>
+          <td class="px-4 py-3 font-mono text-sm font-bold" style="color:${deltaColor}">${deltaStr}</td>
+          <td class="px-4 py-3 text-xs text-muted">${m.user}</td>
+          <td class="px-4 py-3 font-mono text-muted" style="font-size:11px">${dateStr} ${timeStr}</td>
+          <td class="px-4 py-3">
+            <div class="flex gap-2">
+              <button onclick="editMovimento(${m.id})" class="px-2.5 py-1 rounded-md text-xs font-mono" style="background:#1e2334;border:1px solid rgba(255,255,255,0.07);color:#e8eaf0">editar</button>
+              <button onclick="deleteMovimento(${m.id})" class="px-2.5 py-1 rounded-md text-xs font-mono" style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.15);color:#f87171">eliminar</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+
+      const pag = document.getElementById('pagination');
+      pag.innerHTML = '';
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = 'w-7 h-7 rounded-md font-mono text-xs transition-all';
+        btn.style.cssText = i === page ? 'background:rgba(74,222,128,0.1);color:#4ade80;border:1px solid rgba(74,222,128,0.3)' : 'background:#1e2334;color:#6b7280;border:1px solid rgba(255,255,255,0.07)';
+        btn.onclick = () => { page = i; renderTable(); };
+        pag.appendChild(btn);
+      }
+    }
+
+    function toLocalInput(d) {
+      const pad = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function syncDelta() {
+      const tipo = document.getElementById('f-tipo').value;
+      const inp = document.getElementById('f-delta');
+      if (tipo === 'Saída') { if (parseInt(inp.value) > 0) inp.value = -Math.abs(inp.value); }
+      else { if (parseInt(inp.value) < 0) inp.value = Math.abs(inp.value); }
+    }
+
+    function openModal(m = null) {
+      document.getElementById('edit-id').value = m ? m.id : '';
+      document.getElementById('modal-title').textContent = m ? 'Editar Movimento' : 'Novo Movimento';
+      document.getElementById('f-nome').value = m ? m.nome : '';
+      document.getElementById('f-tipo').value = m ? m.tipo : 'Entrada';
+      document.getElementById('f-produto').value = m ? m.produto : 'Papel A4 500fls';
+      document.getElementById('f-delta').value = m ? m.delta : '';
+      document.getElementById('f-user').value = m ? m.user : 'Admin';
+      document.getElementById('f-ts').value = m ? toLocalInput(m.ts) : toLocalInput(new Date());
+      document.getElementById('f-desc').value = m ? m.desc : '';
+      document.getElementById('modal').classList.remove('hidden');
+    }
+    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+    function editMovimento(id) { openModal(movimentos.find(m => m.id === id)); }
+
+    function saveMovimento() {
+      const id = document.getElementById('edit-id').value;
+      const nome = document.getElementById('f-nome').value.trim();
+      if (!nome) return;
+      const obj = {
+        nome, tipo: document.getElementById('f-tipo').value,
+        produto: document.getElementById('f-produto').value,
+        delta: parseInt(document.getElementById('f-delta').value) || 0,
+        user: document.getElementById('f-user').value,
+        ts: new Date(document.getElementById('f-ts').value),
+        desc: document.getElementById('f-desc').value.trim(),
+      };
+      if (id) { Object.assign(movimentos.find(m => m.id == id), obj); }
+      else { movimentos.unshift({ id: nextId++, ...obj }); }
+      closeModal(); renderTable();
+    }
+
+    function deleteMovimento(id) {
+      delTarget = id;
+      const m = movimentos.find(m => m.id === id);
+      document.getElementById('del-name').textContent = `"${m.nome}" será removido permanentemente.`;
+      document.getElementById('del-modal').classList.remove('hidden');
+    }
+    function closeDelModal() { document.getElementById('del-modal').classList.add('hidden'); delTarget = null; }
+    function confirmDelete() { movimentos = movimentos.filter(m => m.id !== delTarget); closeDelModal(); renderTable(); }
+
+    renderTable();
+</script>

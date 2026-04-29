@@ -1,0 +1,186 @@
+﻿@{
+    ViewData["Title"] = "Categorias";
+}
+
+<div class="flex-1 flex flex-col overflow-hidden">
+    <header class="px-7 py-4 flex items-center justify-between"
+      style="background:#13161f; border-bottom:1px solid rgba(255,255,255,0.07)">
+      <h1 class="text-base font-medium">Categorias</h1>
+      <button onclick="openModal()"
+        class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium text-bg bg-accent hover:opacity-90 transition-opacity">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        Nova Categoria
+      </button>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-7 flex flex-col gap-4">
+
+      <!-- Search -->
+      <div class="flex items-center gap-3">
+        <div class="relative flex-1 max-w-xs">
+          <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted pointer-events-none"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input id="search" type="text" placeholder="Pesquisar categorias..."
+            class="w-full pl-8 pr-3 py-2 rounded-lg text-sm" oninput="render()" />
+        </div>
+        <span id="count" class="font-mono text-muted text-xs ml-auto"></span>
+      </div>
+
+      <!-- Cards grid -->
+      <div id="grid" class="grid grid-cols-3 gap-4"></div>
+
+    </main>
+</div>
+
+  <!-- Modal -->
+<div id="modal" class="fixed inset-0 flex items-center justify-center z-50 hidden" style="background:rgba(0,0,0,0.6)">
+<div class="w-80 rounded-2xl overflow-hidden" style="background:#13161f; border:1px solid rgba(255,255,255,0.1)">
+    <div class="px-6 py-5 flex items-center justify-between" style="border-bottom:1px solid rgba(255,255,255,0.07)">
+    <h2 id="modal-title" class="text-sm font-medium">Nova Categoria</h2>
+    <button onclick="closeModal()" class="text-muted hover:text-white text-xl leading-none px-1">×</button>
+    </div>
+    <div class="p-6 flex flex-col gap-4">
+    <input type="hidden" id="edit-id" />
+    <div class="flex flex-col gap-1.5">
+        <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Nome</label>
+        <input id="f-nome" type="text" placeholder="Nome da categoria" class="px-3 py-2 rounded-lg text-sm" />
+    </div>
+    <div class="flex flex-col gap-1.5">
+        <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Cor de destaque</label>
+        <div class="flex gap-2 flex-wrap" id="color-picker"></div>
+    </div>
+    </div>
+    <div class="px-6 pb-6 flex gap-2 justify-end">
+    <button onclick="closeModal()" class="px-4 py-2 rounded-lg text-xs font-medium text-muted"
+        style="background:#1e2334; border:1px solid rgba(255,255,255,0.07)">Cancelar</button>
+    <button onclick="saveCategoria()"
+        class="px-4 py-2 rounded-lg text-xs font-medium text-bg bg-accent hover:opacity-90">Guardar</button>
+    </div>
+</div>
+</div>
+
+<!-- Delete confirm -->
+<div id="del-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden"
+style="background:rgba(0,0,0,0.6)">
+<div class="w-80 rounded-2xl overflow-hidden" style="background:#13161f; border:1px solid rgba(255,255,255,0.1)">
+    <div class="p-6">
+    <div class="w-10 h-10 rounded-full flex items-center justify-center mb-4"
+        style="background:rgba(248,113,113,0.1)">
+        <svg class="w-5 h-5 text-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+        <line x1="12" y1="9" x2="12" y2="13" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+    </div>
+    <h3 class="text-sm font-medium mb-1">Eliminar categoria?</h3>
+    <p id="del-name" class="text-xs text-muted mb-5"></p>
+    <div class="flex gap-2 justify-end">
+        <button onclick="closeDelModal()" class="px-4 py-2 rounded-lg text-xs font-medium text-muted"
+        style="background:#1e2334; border:1px solid rgba(255,255,255,0.07)">Cancelar</button>
+        <button onclick="confirmDelete()" class="px-4 py-2 rounded-lg text-xs font-medium text-white"
+        style="background:#b91c1c">Eliminar</button>
+    </div>
+    </div>
+</div>
+</div>
+<script>
+    const palette = [
+      { name: 'Verde', color: '#4ade80', bg: 'rgba(74,222,128,0.12)' },
+      { name: 'Azul', color: '#38bdf8', bg: 'rgba(56,189,248,0.12)' },
+      { name: 'Âmbar', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
+      { name: 'Roxo', color: '#a78bfa', bg: 'rgba(167,139,250,0.12)' },
+      { name: 'Coral', color: '#f87171', bg: 'rgba(248,113,113,0.12)' },
+      { name: 'Rosa', color: '#f472b6', bg: 'rgba(244,114,182,0.12)' },
+    ];
+
+    let categorias = [
+      { id: 1, nome: 'Escritório', color: '#38bdf8', bg: 'rgba(56,189,248,0.12)', produtos: 5 },
+      { id: 2, nome: 'Consumíveis', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)', produtos: 3 },
+      { id: 3, nome: 'Embalagem', color: '#4ade80', bg: 'rgba(74,222,128,0.12)', produtos: 2 },
+      { id: 4, nome: 'Limpeza', color: '#a78bfa', bg: 'rgba(167,139,250,0.12)', produtos: 1 },
+    ];
+    let nextId = 5, delTarget = null, selectedColor = palette[0];
+
+    function render() {
+      const q = document.getElementById('search').value.toLowerCase();
+      const data = categorias.filter(c => c.nome.toLowerCase().includes(q));
+      document.getElementById('count').textContent = `${data.length} categoria${data.length !== 1 ? 's' : ''}`;
+
+      document.getElementById('grid').innerHTML = data.map(c => {
+        return `
+        <div class="bg-surface rounded-xl p-5 flex flex-col gap-4 hover:bg-surface2 transition-colors" style="border:1px solid rgba(255,255,255,0.07)">
+          <div>
+            <p class="font-medium text-sm">${c.nome}</p>
+            <p class="font-mono text-muted mt-1" style="font-size:11px">${c.produtos} produto${c.produtos !== 1 ? 's' : ''}</p>
+          </div>
+          <div class="flex items-start justify-between">
+            <div class="flex gap-1.5">
+              <button onclick="editCategoria(${c.id})" class="px-2.5 py-1 rounded-md text-xs font-mono" style="background:#1e2334;border:1px solid rgba(255,255,255,0.07);color:#e8eaf0">editar</button>
+              <button onclick="deleteCategoria(${c.id})" class="px-2.5 py-1 rounded-md text-xs font-mono" style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.15);color:#f87171">×</button>
+            </div>
+          </div>
+          <div class="h-0.5 rounded-full" style="background:${c.bg}">
+            <div class="h-full rounded-full" style="width:${Math.min(100, c.produtos * 20)}%; background:${c.color}"></div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function buildColorPicker(selected) {
+      document.getElementById('color-picker').innerHTML = palette.map((p, i) => `
+        <button type="button" onclick="selectColor(${i})" id="cp-${i}"
+          class="w-7 h-7 rounded-full transition-all flex items-center justify-center"
+          style="background:${p.color}; outline: ${p.color === selected ? `3px solid ${p.color}` : 'none'}; outline-offset:2px">
+        </button>
+      `).join('');
+      selectedColor = palette.find(p => p.color === selected) || palette[0];
+    }
+
+    function selectColor(i) {
+      selectedColor = palette[i];
+      palette.forEach((_, j) => {
+        const btn = document.getElementById(`cp-${j}`);
+        btn.style.outline = j === i ? `3px solid ${palette[j].color}` : 'none';
+      });
+    }
+
+    function openModal(c = null) {
+      document.getElementById('edit-id').value = c ? c.id : '';
+      document.getElementById('modal-title').textContent = c ? 'Editar Categoria' : 'Nova Categoria';
+      document.getElementById('f-nome').value = c ? c.nome : '';
+      buildColorPicker(c ? c.color : palette[0].color);
+      document.getElementById('modal').classList.remove('hidden');
+    }
+    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+    function editCategoria(id) { openModal(categorias.find(c => c.id === id)); }
+
+    function saveCategoria() {
+      const id = document.getElementById('edit-id').value;
+      const nome = document.getElementById('f-nome').value.trim();
+      if (!nome) return;
+      if (id) {
+        const c = categorias.find(c => c.id == id);
+        Object.assign(c, { nome, color: selectedColor.color, bg: selectedColor.bg });
+      } else {
+        categorias.push({ id: nextId++, nome, color: selectedColor.color, bg: selectedColor.bg, produtos: 0 });
+      }
+      closeModal(); render();
+    }
+
+    function deleteCategoria(id) {
+      delTarget = id;
+      const c = categorias.find(c => c.id === id);
+      document.getElementById('del-name').textContent = `"${c.nome}" será removida permanentemente.`;
+      document.getElementById('del-modal').classList.remove('hidden');
+    }
+    function closeDelModal() { document.getElementById('del-modal').classList.add('hidden'); delTarget = null; }
+    function confirmDelete() { categorias = categorias.filter(c => c.id !== delTarget); closeDelModal(); render(); }
+
+    render();
+  </script>

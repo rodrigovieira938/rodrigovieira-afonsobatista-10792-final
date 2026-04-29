@@ -1,0 +1,278 @@
+﻿@{
+    ViewData["Title"] = "Produtos";
+}
+<!-- Main -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <header class="px-7 py-4 flex items-center justify-between"
+      style="background:#13161f; border-bottom:1px solid rgba(255,255,255,0.07)">
+      <h1 class="text-base font-medium">Produtos</h1>
+      <button onclick="openModal()"
+        class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium text-bg bg-accent hover:opacity-90 transition-opacity">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        Novo Produto
+      </button>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-7 flex flex-col gap-4">
+
+      <!-- Toolbar -->
+      <div class="flex items-center gap-3">
+        <div class="relative flex-1 max-w-xs">
+          <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted pointer-events-none"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input id="search" type="text" placeholder="Pesquisar produtos..."
+            class="w-full pl-8 pr-3 py-2 rounded-lg text-sm" oninput="renderTable()" />
+        </div>
+        <select id="filterCat" class="px-3 py-2 rounded-lg text-sm" onchange="renderTable()">
+          <option value="">Todas as categorias</option>
+          <option>Escritório</option>
+          <option>Consumíveis</option>
+          <option>Embalagem</option>
+          <option>Limpeza</option>
+        </select>
+        <span id="count" class="font-mono text-muted text-xs ml-auto"></span>
+      </div>
+
+      <!-- Table -->
+      <div class="bg-surface rounded-xl overflow-hidden" style="border:1px solid rgba(255,255,255,0.07)">
+        <table class="w-full border-collapse">
+          <thead style="background:#1e2334">
+            <tr>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">#</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Nome</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Categoria</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Preço Unit.</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Stock</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Stock Mín.</th>
+              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
+                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="flex items-center justify-between">
+        <span id="page-info" class="font-mono text-muted text-xs"></span>
+        <div class="flex gap-1" id="pagination"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="fixed inset-0 flex items-center justify-center z-50 hidden" style="background:rgba(0,0,0,0.6)">
+    <div class="w-96 rounded-2xl overflow-hidden" style="background:#13161f; border:1px solid rgba(255,255,255,0.1)">
+      <div class="px-6 py-5 flex items-center justify-between" style="border-bottom:1px solid rgba(255,255,255,0.07)">
+        <h2 id="modal-title" class="text-sm font-medium">Novo Produto</h2>
+        <button onclick="closeModal()" class="text-muted hover:text-white text-xl leading-none px-1">×</button>
+      </div>
+      <div class="p-6 flex flex-col gap-4">
+        <input type="hidden" id="edit-id" />
+        <div class="flex flex-col gap-1.5">
+          <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Nome</label>
+          <input id="f-nome" type="text" placeholder="Nome do produto" class="px-3 py-2 rounded-lg text-sm" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Categoria</label>
+          <select id="f-cat" class="px-3 py-2 rounded-lg text-sm">
+            <option>Escritório</option>
+            <option>Consumíveis</option>
+            <option>Embalagem</option>
+            <option>Limpeza</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1.5">
+            <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Preço Unit. (€)</label>
+            <input id="f-preco" type="number" step="0.01" placeholder="0.00" class="px-3 py-2 rounded-lg text-sm" />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Stock Mínimo</label>
+            <input id="f-min" type="number" placeholder="0" class="px-3 py-2 rounded-lg text-sm" />
+          </div>
+        </div>
+      </div>
+      <div class="px-6 pb-6 flex gap-2 justify-end">
+        <button onclick="closeModal()"
+          class="px-4 py-2 rounded-lg text-xs font-medium text-muted hover:text-white transition-colors"
+          style="background:#1e2334; border:1px solid rgba(255,255,255,0.07)">Cancelar</button>
+        <button onclick="saveProduct()"
+          class="px-4 py-2 rounded-lg text-xs font-medium text-bg bg-accent hover:opacity-90 transition-opacity">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete confirm -->
+  <div id="del-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden"
+    style="background:rgba(0,0,0,0.6)">
+    <div class="w-80 rounded-2xl overflow-hidden" style="background:#13161f; border:1px solid rgba(255,255,255,0.1)">
+      <div class="p-6">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center mb-4"
+          style="background:rgba(248,113,113,0.1)">
+          <svg class="w-5 h-5 text-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+        </div>
+        <h3 class="text-sm font-medium mb-1">Eliminar produto?</h3>
+        <p id="del-name" class="text-xs text-muted mb-5"></p>
+        <div class="flex gap-2 justify-end">
+          <button onclick="closeDelModal()" class="px-4 py-2 rounded-lg text-xs font-medium text-muted"
+            style="background:#1e2334; border:1px solid rgba(255,255,255,0.07)">Cancelar</button>
+          <button onclick="confirmDelete()" class="px-4 py-2 rounded-lg text-xs font-medium text-white"
+            style="background:#b91c1c">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const catColors = {
+      'Escritório': { bg: 'rgba(56,189,248,0.1)', color: '#38bdf8' },
+      'Consumíveis': { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b' },
+      'Embalagem': { bg: 'rgba(74,222,128,0.1)', color: '#4ade80' },
+      'Limpeza': { bg: 'rgba(167,139,250,0.1)', color: '#a78bfa' },
+    };
+
+    let products = [
+      { id: 1, nome: 'Papel A4 500fls', categoria: 'Escritório', preco: 4.99, stock: 340, min: 50 },
+      { id: 2, nome: 'Toner HP 85A', categoria: 'Consumíveis', preco: 89.99, stock: 2, min: 10 },
+      { id: 3, nome: 'Envelopes DL cx500', categoria: 'Embalagem', preco: 12.50, stock: 8, min: 50 },
+      { id: 4, nome: 'Canetas Bic Azul', categoria: 'Escritório', preco: 0.35, stock: 120, min: 30 },
+      { id: 5, nome: 'Dossiers A4 Lux', categoria: 'Escritório', preco: 3.20, stock: 75, min: 20 },
+      { id: 6, nome: 'Fita Adesiva 48mm', categoria: 'Escritório', preco: 1.80, stock: 12, min: 20 },
+      { id: 7, nome: 'Detergente Multi-usos', categoria: 'Limpeza', preco: 6.50, stock: 40, min: 15 },
+      { id: 8, nome: 'Etiquetas 100x50', categoria: 'Embalagem', preco: 8.00, stock: 18, min: 30 },
+      { id: 9, nome: 'Marcadores Perm.', categoria: 'Escritório', preco: 2.10, stock: 3, min: 15 },
+      { id: 10, nome: 'Post-it 76x76', categoria: 'Escritório', preco: 3.50, stock: 60, min: 20 },
+      { id: 11, nome: 'Cartuchos Epson T3', categoria: 'Consumíveis', preco: 14.99, stock: 25, min: 10 },
+      { id: 12, nome: 'Sacos Plástico L', categoria: 'Embalagem', preco: 5.20, stock: 200, min: 50 },
+    ];
+
+    let nextId = 13;
+    let page = 1;
+    const perPage = 8;
+    let delTarget = null;
+
+    function filtered() {
+      const q = document.getElementById('search').value.toLowerCase();
+      const cat = document.getElementById('filterCat').value;
+      return products.filter(p =>
+        p.nome.toLowerCase().includes(q) &&
+        (!cat || p.categoria === cat)
+      );
+    }
+
+    function stockColor(stock, min) {
+      if (stock <= min * 0.3) return '#f87171';
+      if (stock < min) return '#f59e0b';
+      return '#4ade80';
+    }
+
+    function renderTable() {
+      const data = filtered();
+      const total = data.length;
+      const totalPages = Math.ceil(total / perPage);
+      if (page > totalPages) page = 1;
+      const slice = data.slice((page - 1) * perPage, page * perPage);
+
+      document.getElementById('count').textContent = `${total} produto${total !== 1 ? 's' : ''}`;
+      document.getElementById('page-info').textContent = `Página ${page} de ${Math.max(1, totalPages)}`;
+
+      const tbody = document.getElementById('tbody');
+      tbody.innerHTML = slice.map(p => {
+        const c = catColors[p.categoria] || { bg: '#1e2334', color: '#6b7280' };
+        const sc = stockColor(p.stock, p.min);
+        return `
+        <tr class="hover:bg-surface2 transition-colors" style="border-bottom:1px solid rgba(255,255,255,0.05)">
+          <td class="px-4 py-3 font-mono text-muted" style="font-size:11px">#${p.id}</td>
+          <td class="px-4 py-3 text-sm font-medium">${p.nome}</td>
+          <td class="px-4 py-3">
+            <span class="font-mono px-2 py-0.5 rounded text-xs" style="background:${c.bg}; color:${c.color}">${p.categoria}</span>
+          </td>
+          <td class="px-4 py-3 font-mono text-sm">€${p.preco.toFixed(2)}</td>
+          <td class="px-4 py-3 font-mono text-sm font-bold" style="color:${sc}">${p.stock}</td>
+          <td class="px-4 py-3 font-mono text-xs text-muted">${p.min}</td>
+          <td class="px-4 py-3">
+            <div class="flex gap-2">
+              <button onclick="editProduct(${p.id})" class="px-2.5 py-1 rounded-md text-xs font-mono transition-colors" style="background:#1e2334; border:1px solid rgba(255,255,255,0.07); color:#e8eaf0">editar</button>
+              <button onclick="deleteProduct(${p.id})" class="px-2.5 py-1 rounded-md text-xs font-mono transition-colors" style="background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.15); color:#f87171">eliminar</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+
+      const pag = document.getElementById('pagination');
+      pag.innerHTML = '';
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = 'w-7 h-7 rounded-md font-mono text-xs transition-all';
+        btn.style.cssText = i === page
+          ? 'background:rgba(74,222,128,0.1); color:#4ade80; border:1px solid rgba(74,222,128,0.3)'
+          : 'background:#1e2334; color:#6b7280; border:1px solid rgba(255,255,255,0.07)';
+        btn.onclick = () => { page = i; renderTable(); };
+        pag.appendChild(btn);
+      }
+    }
+
+    function openModal(p = null) {
+      document.getElementById('edit-id').value = p ? p.id : '';
+      document.getElementById('modal-title').textContent = p ? 'Editar Produto' : 'Novo Produto';
+      document.getElementById('f-nome').value = p ? p.nome : '';
+      document.getElementById('f-cat').value = p ? p.categoria : 'Escritório';
+      document.getElementById('f-preco').value = p ? p.preco : '';
+      document.getElementById('f-min').value = p ? p.min : '';
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+    function editProduct(id) { openModal(products.find(p => p.id === id)); }
+
+    function saveProduct() {
+      const id = document.getElementById('edit-id').value;
+      const nome = document.getElementById('f-nome').value.trim();
+      const categoria = document.getElementById('f-cat').value;
+      const preco = parseFloat(document.getElementById('f-preco').value) || 0;
+      const min = parseInt(document.getElementById('f-min').value) || 0;
+      if (!nome) return;
+      if (id) {
+        const p = products.find(p => p.id == id);
+        Object.assign(p, { nome, categoria, preco, min });
+      } else {
+        products.push({ id: nextId++, nome, categoria, preco, stock: 0, min });
+      }
+      closeModal();
+      renderTable();
+    }
+
+    function deleteProduct(id) {
+      delTarget = id;
+      const p = products.find(p => p.id === id);
+      document.getElementById('del-name').textContent = `"${p.nome}" será removido permanentemente.`;
+      document.getElementById('del-modal').classList.remove('hidden');
+    }
+
+    function closeDelModal() { document.getElementById('del-modal').classList.add('hidden'); delTarget = null; }
+
+    function confirmDelete() {
+      products = products.filter(p => p.id !== delTarget);
+      closeDelModal();
+      renderTable();
+    }
+
+    renderTable();
+  </script>
