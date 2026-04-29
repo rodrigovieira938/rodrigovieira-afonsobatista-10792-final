@@ -81,13 +81,6 @@
             <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Nome</label>
             <input id="f-nome" type="text" placeholder="Nome completo" class="px-3 py-2 rounded-lg text-sm" />
           </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Papel</label>
-            <select id="f-role" class="px-3 py-2 rounded-lg text-sm">
-              <option>Admin</option>
-              <option>Operador</option>
-            </select>
-          </div>
         </div>
         <div class="flex flex-col gap-1.5">
           <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Email</label>
@@ -237,7 +230,6 @@
       document.getElementById('modal-title').textContent = u ? 'Editar Utilizador' : 'Novo Utilizador';
       document.getElementById('f-nome').value = u ? u.nome : '';
       document.getElementById('f-email').value = u ? u.email : '';
-      document.getElementById('f-role').value = u ? u.role : 'Operador';
       document.getElementById('f-pwd').value = '';
       document.getElementById('f-pwd2').value = '';
 
@@ -264,24 +256,16 @@
       const id = document.getElementById('edit-id').value;
       const nome = document.getElementById('f-nome').value.trim();
       const email = document.getElementById('f-email').value.trim();
-      const role = document.getElementById('f-role').value;
-      const active = document.getElementById('f-active').checked;
       const pwd = document.getElementById('f-pwd').value;
       const pwd2 = document.getElementById('f-pwd2').value;
-      const changePwd = !id || document.getElementById('change-pwd').checked;
 
-      document.getElementById('pwd-mismatch').classList.add('hidden');
       if (!nome || !email) return;
-      if (changePwd && pwd !== pwd2) {
-        document.getElementById('pwd-mismatch').classList.remove('hidden');
-        return;
-      }
 
       if (id) {
         const u = utilizadores.find(u => u.id == id);
-        Object.assign(u, { nome, email, role, active });
+        Object.assign(u, { nome, email });
       } else {
-        utilizadores.push({ id: nextId++, nome, email, role, active, lastAccess: new Date() });
+        utilizadores.push({ id: nextId++, nome, email,});
       }
       closeModal(); renderTable();
     }
