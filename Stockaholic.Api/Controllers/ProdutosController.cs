@@ -33,6 +33,30 @@ namespace Stockaholic.API.Controllers
             }
             return Ok(produto);
         }
+        [HttpGet("numero")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(int))]
+        public ActionResult<int> Count()
+        {
+            return Ok(_context.Produtos.Count());
+        }
+        [HttpGet("valor")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(double))]
+        public ActionResult<double> Value()
+        {
+            var value = _context.Movimentos.GroupBy(m => m.ProdutoId)
+                .Select(g => new
+                {
+                    ProdutoId = g.Key,
+                    Quantidade = g.Sum(m => m.Delta)
+                })
+                .Join(_context.Produtos, m => m.ProdutoId, p => p.Id, (m, p) => new
+                {
+                    Valor = p.Preco * m.Quantidade
+                })
+                .Sum(x => x.Valor);
+            return Ok(value);
+        }
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type=typeof(Produto))]
         public ActionResult<Produto> Post([FromBody] CreateProduto createProduto)
