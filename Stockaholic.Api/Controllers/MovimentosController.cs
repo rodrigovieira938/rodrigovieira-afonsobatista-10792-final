@@ -54,18 +54,31 @@ namespace Stockaholic.API.Controllers
         }
         [HttpGet("stock")]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<ProdutoStock>))]
-        public ActionResult<IEnumerable<ProdutoStock>> GetStock()
+        public async Task<ActionResult<IEnumerable<ProdutoStock>>> GetStock()
         {
-            var res = _context.Movimentos.GroupBy(m => m.ProdutoId)
-                .Select(g => new ProdutoStock
+            var produtosStock = await _context.Produtos
+                .GroupJoin(
+                    _context.Movimentos,
+                    p => p.Id,
+                    m => m.ProdutoId,
+                    (p, movimentos) => new
+                    {
+                        Produto = p,
+                        Quantidade = movimentos.Sum(m => (int?)m.Delta) ?? 0
+                    }
+                )
+                .Select(x => new ProdutoStock
                 {
-                    ProdutoId = g.Key,
-                    Nome = _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.Nome).FirstOrDefault() ?? "",
-                    Quantidade = g.Sum(m => m.Delta),
-                    ValorTotal = g.Sum(m => m.Delta) * _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.Preco).FirstOrDefault()
+                    ProdutoId = x.Produto.Id,
+                    Nome = x.Produto.Nome,
+                    CategoriaId = x.Produto.CategoriaId,
+                    Categoria = x.Produto.Categoria.Nome,
+                    Quantidade = x.Quantidade,
+                    Valor = x.Produto.Preco
                 })
-                .ToList();
-            return Ok(res);
+                .ToListAsync();
+
+            return Ok(produtosStock);
         }
         [HttpGet("top-valor")]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<ProdutoStock>))]
@@ -76,10 +89,12 @@ namespace Stockaholic.API.Controllers
                 {
                     ProdutoId = g.Key,
                     Nome = _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.Nome).FirstOrDefault() ?? "",
+                     CategoriaId = _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.CategoriaId).FirstOrDefault(),
+                    Categoria = _context.Categorias.Where(c => c.Id == _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.CategoriaId).FirstOrDefault()).Select(c => c.Nome).FirstOrDefault() ?? "",
                     Quantidade = g.Sum(m => m.Delta),
-                    ValorTotal = g.Sum(m => m.Delta) * _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.Preco).FirstOrDefault()
+                    Valor = g.Sum(m => m.Delta) * _context.Produtos.Where(p => p.Id == g.Key).Select(p => p.Preco).FirstOrDefault()
                 })
-                .OrderByDescending(ps => ps.ValorTotal)
+                .OrderByDescending(ps => ps.Valor)
                 .Take(8)
                 .ToList();
             return Ok(res);

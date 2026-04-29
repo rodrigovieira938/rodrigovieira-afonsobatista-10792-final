@@ -4,7 +4,9 @@ namespace Stockaholic.API.Models
     {
         public int ProdutoId { get; set; }
         public string Nome { get; set; } = null!;
+        public int CategoriaId { get; set; }
+        public string Categoria { get; set; } = null!;
         public int Quantidade { get; set; }
-        public float ValorTotal { get; set; }
+        public float Valor { get; set; }
     }
 }

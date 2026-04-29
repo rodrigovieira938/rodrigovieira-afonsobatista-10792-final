@@ -74,13 +74,15 @@ namespace Stockaholic.API.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type=typeof(BadRequestResult))]
-        public ActionResult<Produto> Put(int id, [FromBody] Produto produto)
+        public ActionResult<Produto> Put(int id, [FromBody] CreateProduto produto)
         {
-            if (id != produto.Id)
-            {
-                return BadRequest("O ID da URL deve ser igual ao ID do corpo da requisição.");
-            }
-            _context.Entry(produto).State = EntityState.Modified;
+            var _produto = new Produto {
+                Id = id,
+                Nome = produto.Nome,
+                CategoriaId = produto.CategoriaId,
+                Preco = produto.Preco
+            };
+            _context.Entry(_produto).State = EntityState.Modified;
             _context.SaveChanges();
             return NoContent();
         }

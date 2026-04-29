@@ -1,4 +1,5 @@
-﻿@{
+﻿@model ViewProdutos
+@{
     ViewData["Title"] = "Produtos";
 }
 <!-- Main -->
@@ -30,10 +31,10 @@
         </div>
         <select id="filterCat" class="px-3 py-2 rounded-lg text-sm" onchange="renderTable()">
           <option value="">Todas as categorias</option>
-          <option>Escritório</option>
-          <option>Consumíveis</option>
-          <option>Embalagem</option>
-          <option>Limpeza</option>
+          @foreach (var categoria in Model.Categorias)
+          {
+            <option>@categoria.Nome</option>
+          }
         </select>
         <span id="count" class="font-mono text-muted text-xs ml-auto"></span>
       </div>
@@ -53,8 +54,6 @@
                 style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Preço Unit.</th>
               <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
                 style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Stock</th>
-              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
-                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Stock Mín.</th>
               <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
                 style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Ações</th>
             </tr>
@@ -87,20 +86,16 @@
         <div class="flex flex-col gap-1.5">
           <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Categoria</label>
           <select id="f-cat" class="px-3 py-2 rounded-lg text-sm">
-            <option>Escritório</option>
-            <option>Consumíveis</option>
-            <option>Embalagem</option>
-            <option>Limpeza</option>
+            @foreach (var categoria in Model.Categorias)
+            {
+              <option>@categoria.Nome</option>
+            }
           </select>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div class="flex flex-col gap-1.5">
             <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Preço Unit. (€)</label>
             <input id="f-preco" type="number" step="0.01" placeholder="0.00" class="px-3 py-2 rounded-lg text-sm" />
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="font-mono text-muted uppercase tracking-wider" style="font-size:10px">Stock Mínimo</label>
-            <input id="f-min" type="number" placeholder="0" class="px-3 py-2 rounded-lg text-sm" />
           </div>
         </div>
       </div>
@@ -139,26 +134,19 @@
     </div>
   </div>
   <script>
-    const catColors = {
-      'Escritório': { bg: 'rgba(56,189,248,0.1)', color: '#38bdf8' },
-      'Consumíveis': { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b' },
-      'Embalagem': { bg: 'rgba(74,222,128,0.1)', color: '#4ade80' },
-      'Limpeza': { bg: 'rgba(167,139,250,0.1)', color: '#a78bfa' },
-    };
-
     let products = [
-      { id: 1, nome: 'Papel A4 500fls', categoria: 'Escritório', preco: 4.99, stock: 340, min: 50 },
-      { id: 2, nome: 'Toner HP 85A', categoria: 'Consumíveis', preco: 89.99, stock: 2, min: 10 },
-      { id: 3, nome: 'Envelopes DL cx500', categoria: 'Embalagem', preco: 12.50, stock: 8, min: 50 },
-      { id: 4, nome: 'Canetas Bic Azul', categoria: 'Escritório', preco: 0.35, stock: 120, min: 30 },
-      { id: 5, nome: 'Dossiers A4 Lux', categoria: 'Escritório', preco: 3.20, stock: 75, min: 20 },
-      { id: 6, nome: 'Fita Adesiva 48mm', categoria: 'Escritório', preco: 1.80, stock: 12, min: 20 },
-      { id: 7, nome: 'Detergente Multi-usos', categoria: 'Limpeza', preco: 6.50, stock: 40, min: 15 },
-      { id: 8, nome: 'Etiquetas 100x50', categoria: 'Embalagem', preco: 8.00, stock: 18, min: 30 },
-      { id: 9, nome: 'Marcadores Perm.', categoria: 'Escritório', preco: 2.10, stock: 3, min: 15 },
-      { id: 10, nome: 'Post-it 76x76', categoria: 'Escritório', preco: 3.50, stock: 60, min: 20 },
-      { id: 11, nome: 'Cartuchos Epson T3', categoria: 'Consumíveis', preco: 14.99, stock: 25, min: 10 },
-      { id: 12, nome: 'Sacos Plástico L', categoria: 'Embalagem', preco: 5.20, stock: 200, min: 50 },
+      @foreach (var p in Model.Produtos) {
+        <text>
+        { id: @p.ProdutoId, nome: '@p.Nome', categoria: '@p.Categoria', preco: @p.Valor, stock: @p.Quantidade},
+        </text>
+      }
+    ];
+    let categorias = [
+      @foreach (var c in Model.Categorias) {
+        <text>
+        { id: @c.Id, nome: '@c.Nome' },
+        </text>
+      }
     ];
 
     let nextId = 13;
@@ -175,12 +163,6 @@
       );
     }
 
-    function stockColor(stock, min) {
-      if (stock <= min * 0.3) return '#f87171';
-      if (stock < min) return '#f59e0b';
-      return '#4ade80';
-    }
-
     function renderTable() {
       const data = filtered();
       const total = data.length;
@@ -193,18 +175,15 @@
 
       const tbody = document.getElementById('tbody');
       tbody.innerHTML = slice.map(p => {
-        const c = catColors[p.categoria] || { bg: '#1e2334', color: '#6b7280' };
-        const sc = stockColor(p.stock, p.min);
         return `
         <tr class="hover:bg-surface2 transition-colors" style="border-bottom:1px solid rgba(255,255,255,0.05)">
           <td class="px-4 py-3 font-mono text-muted" style="font-size:11px">#${p.id}</td>
           <td class="px-4 py-3 text-sm font-medium">${p.nome}</td>
           <td class="px-4 py-3">
-            <span class="font-mono px-2 py-0.5 rounded text-xs" style="background:${c.bg}; color:${c.color}">${p.categoria}</span>
+            <span class="font-mono px-2 py-0.5 rounded text-xs" style="background:#1e2334; color:#6b7280">${p.categoria}</span>
           </td>
           <td class="px-4 py-3 font-mono text-sm">€${p.preco.toFixed(2)}</td>
-          <td class="px-4 py-3 font-mono text-sm font-bold" style="color:${sc}">${p.stock}</td>
-          <td class="px-4 py-3 font-mono text-xs text-muted">${p.min}</td>
+          <td class="px-4 py-3 font-mono text-sm font-bold" style="color:#4ade80">${p.stock}</td>
           <td class="px-4 py-3">
             <div class="flex gap-2">
               <button onclick="editProduct(${p.id})" class="px-2.5 py-1 rounded-md text-xs font-mono transition-colors" style="background:#1e2334; border:1px solid rgba(255,255,255,0.07); color:#e8eaf0">editar</button>
@@ -234,7 +213,6 @@
       document.getElementById('f-nome').value = p ? p.nome : '';
       document.getElementById('f-cat').value = p ? p.categoria : 'Escritório';
       document.getElementById('f-preco').value = p ? p.preco : '';
-      document.getElementById('f-min').value = p ? p.min : '';
       document.getElementById('modal').classList.remove('hidden');
     }
 
@@ -247,13 +225,39 @@
       const nome = document.getElementById('f-nome').value.trim();
       const categoria = document.getElementById('f-cat').value;
       const preco = parseFloat(document.getElementById('f-preco').value) || 0;
-      const min = parseInt(document.getElementById('f-min').value) || 0;
       if (!nome) return;
       if (id) {
         const p = products.find(p => p.id == id);
-        Object.assign(p, { nome, categoria, preco, min });
+        body = {id, nome, categoria, preco }
+        body.categoriaId = categorias.filter(c => c.nome === categoria)[0].id;
+        body.categoria = undefined;
+        fetch(`/produtos/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        }).then(res => {
+          if (res.ok) {
+             Object.assign(p, { nome, categoria, preco});
+             closeModal();
+             renderTable();
+          } else {
+             alert('Erro ao atualizar produto');
+          }
+        });
       } else {
-        products.push({ id: nextId++, nome, categoria, preco, stock: 0, min });
+        fetch("/produtos", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, categoriaId: categorias.filter(c => c.nome === categoria)[0].id, preco })
+        }).then(res => {
+          if (res.ok) {
+             res.json().then(data => {
+                location.reload()
+             });
+          } else {
+             alert('Erro ao criar produto');
+           }
+        });
       }
       closeModal();
       renderTable();
@@ -269,9 +273,14 @@
     function closeDelModal() { document.getElementById('del-modal').classList.add('hidden'); delTarget = null; }
 
     function confirmDelete() {
-      products = products.filter(p => p.id !== delTarget);
-      closeDelModal();
-      renderTable();
+      console.log(delTarget);
+      fetch(`/produtos/${delTarget}`, { method: 'DELETE' }).then(res => {
+          if (res.ok) {
+            location.reload();
+          } else {           
+            alert('Erro ao eliminar produto');
+          }      
+        });
     }
 
     renderTable();
