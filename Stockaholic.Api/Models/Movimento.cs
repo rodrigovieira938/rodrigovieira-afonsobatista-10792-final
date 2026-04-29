@@ -38,7 +38,6 @@ namespace Stockaholic.API.Models
     public class CreateMovimento
     {
         public string Nome { get; set; } = null!;
-        public DateTime Timestamp { get; set; }
         public int ProdutoId { get; set; }
         public int Delta { get; set; }
         public string? descricao { get; set; }

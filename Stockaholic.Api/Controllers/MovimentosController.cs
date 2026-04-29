@@ -40,7 +40,7 @@ namespace Stockaholic.API.Controllers
             var movimento = new Movimento
             {
                 Nome = createMovimento.Nome,
-                Timestamp = createMovimento.Timestamp,
+                Timestamp = DateTime.UtcNow,
                 ProdutoId = createMovimento.ProdutoId,
                 Delta = createMovimento.Delta,
                 descricao = createMovimento.descricao,
