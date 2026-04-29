@@ -149,7 +149,6 @@
       }
     ];
 
-    let nextId = 13;
     let page = 1;
     const perPage = 8;
     let delTarget = null;
@@ -273,7 +272,6 @@
     function closeDelModal() { document.getElementById('del-modal').classList.add('hidden'); delTarget = null; }
 
     function confirmDelete() {
-      console.log(delTarget);
       fetch(`/produtos/${delTarget}`, { method: 'DELETE' }).then(res => {
           if (res.ok) {
             location.reload();

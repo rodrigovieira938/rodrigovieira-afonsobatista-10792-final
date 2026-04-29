@@ -32,7 +32,7 @@ public class ProdutosController : Controller
         var client = _clientFactory.CreateClient("ApiClient");
         var response = await client.PostAsJsonAsync("/produtos", produto);
         if(response.StatusCode == System.Net.HttpStatusCode.Created) {
-            return Created($"/produtos/{produto.Nome}", response.Content);
+            return Ok();
         } else
         {
             _logger.LogError("Error creating product. Status code: {StatusCode}", response.StatusCode);
