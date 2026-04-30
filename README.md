@@ -4,9 +4,6 @@ Stockaholic is a basic stock management application developed as a school projec
 ## Running
 This project contains Docker and Docker Compose configuration to run the API and a Postgres database.
 
-Files of interest (under `Stockaholic.Api/`):
-
-- `Dockerfile` — multi-stage build for the ASP.NET API (build with .NET SDK, run with ASP.NET runtime).
 - `docker-compose.dev.yml` — development compose: starts a Postgres instance (DB only).
 - `docker-compose.prod.yml` — production compose: builds/runs the API and Postgres together.
 ### Prerequisites
@@ -18,10 +15,16 @@ docker compose -f docker-compose.dev.yml up -d
 ```bash
 dotnet run --project Stockaholic.Api/Stockaholic.Api.csproj
 ```
-Open http://localhost:8080
+```bash
+dotnet run --project Stockaholic.Frontend/Stockaholic.Frontend.csproj
+```
+Open http://localhost:8080/swagger - for the api documentation
+
+Open http://localhost:5018 - for the frontend
 
 ### Prod mode
 ```bash
 docker compose -f docker-compose.prod.yml up -d
 ```
-Open http://localhost:8080
+
+Open http://localhost:5018 - for the frontend
