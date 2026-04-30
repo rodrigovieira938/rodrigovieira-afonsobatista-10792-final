@@ -26,6 +26,8 @@ services:
       dockerfile: Dockerfile
     image: mountebank:latest
     restart: unless-stopped
+    ports:
+      - "3000:3000"
     networks:
       - stockaholic_net
   api:
