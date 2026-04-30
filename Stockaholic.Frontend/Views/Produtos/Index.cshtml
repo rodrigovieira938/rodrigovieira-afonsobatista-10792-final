@@ -250,11 +250,9 @@
           body: JSON.stringify({ nome, categoriaId: categorias.filter(c => c.nome === categoria)[0].id, preco })
         }).then(res => {
           if (res.ok) {
-             res.json().then(data => {
-                location.reload()
-             });
+            location.reload()
           } else {
-             alert('Erro ao criar produto');
+            alert('Erro ao criar produto');
            }
         });
       }
