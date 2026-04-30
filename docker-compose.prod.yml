@@ -20,7 +20,14 @@ services:
       - cache:/data
     networks:
       - stockaholic_net
-
+  mountebank:
+    build:
+      context: ./imposters
+      dockerfile: Dockerfile
+    image: mountebank:latest
+    restart: unless-stopped
+    networks:
+      - stockaholic_net
   api:
     build:
       context: ./Stockaholic.Api

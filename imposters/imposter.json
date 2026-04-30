@@ -1,0 +1,39 @@
+{
+  "port": 3000,
+  "protocol": "http",
+  "name": "Fake resetpassword",
+  "stubs": [
+        {
+          "predicates": [
+            {
+              "equals": {
+                "method": "POST",
+                "path": "/reset-password"
+              }
+            },
+            {
+              "contains": {
+                "body": {
+                  "email": ""
+                }
+              }
+            }
+          ],
+          "responses": [
+            {
+              "is": {
+                "statusCode": 200,
+                "headers": {
+                  "Content-Type": "application/json"
+                },
+                "body": {
+                  "message": "Reset link generated",
+                  "resetUrl": "https://fake-reset.local/reset?token=abc123"
+                }
+              }
+            }
+          ]
+        }
+      ]
+
+}

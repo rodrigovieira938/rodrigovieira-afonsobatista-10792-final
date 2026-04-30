@@ -20,6 +20,15 @@ services:
     command: redis-server --save 20 1 --loglevel warning --requirepass devpass
     volumes:
       - cache:/data
+  mountebank:
+    build:
+      context: ./imposters
+      dockerfile: Dockerfile
+    image: mountebank:latest
+    restart: unless-stopped
+    ports:
+      - "2525:2525"
+      - "3000:3000"
 volumes:
   db_dev_data:
   cache:
