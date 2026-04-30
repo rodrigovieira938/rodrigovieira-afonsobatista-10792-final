@@ -40,7 +40,18 @@ public class UtilizadoresController : Controller
 
         try
         {
-            var response = await client.GetAsync("utilizadores");
+            var response = await client.GetAsync("auth/me");
+            response.EnsureSuccessStatusCode();
+            var me = await response.Content.ReadFromJsonAsync<MeResult>();
+
+            if(me == null)
+            {
+                return Unauthorized();
+            }
+            ViewData["FullName"] = me.Name;
+            ViewData["Initials"] = Utils.Initials(me.Name);
+            ViewData["Email"] = me.Email;
+            response = await client.GetAsync("utilizadores");
             response.EnsureSuccessStatusCode();
 
             var utilizadores = await response.Content.ReadFromJsonAsync<List<Utilizador>>();

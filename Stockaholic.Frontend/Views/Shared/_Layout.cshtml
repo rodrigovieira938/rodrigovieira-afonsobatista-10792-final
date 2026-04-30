@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stockaholic - Dashboard</title>
+    <title>Stockaholic - @ViewData["Title"]</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;700&display=swap"
         rel="stylesheet" />
@@ -227,10 +227,10 @@
         <div class="p-3" style="border-top:1px solid rgba(255,255,255,0.07)">
             <div class="flex items-center gap-2.5 p-2 rounded-lg bg-surface2">
                 <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium text-accent flex-shrink-0"
-                    style="background:rgba(74,222,128,0.15)">AD</div>
+                    style="background:rgba(74,222,128,0.15)">@ViewData["Initials"]</div>
                 <div>
-                    <p class="text-xs font-medium">Admin</p>
-                    <p class="font-mono text-muted" style="font-size:10px">admin@stock.io</p>
+                    <p class="text-xs font-medium">@ViewData["FullName"]</p>
+                    <p class="font-mono text-muted" style="font-size:10px">@ViewData["Email"]</p>
                 </div>
             </div>
         </div>

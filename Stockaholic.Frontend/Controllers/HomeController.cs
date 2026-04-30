@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
+using Stockaholic.Frontend.Models;
 
 namespace Stockaholic.Frontend.Controllers;
 
@@ -25,7 +26,18 @@ public class HomeController : Controller
         
         try
         {
-            var response = await client.GetAsync("auth/valid");
+            var response = await client.GetAsync("auth/me");
+            response.EnsureSuccessStatusCode();
+            var me = await response.Content.ReadFromJsonAsync<MeResult>();
+
+            if(me == null)
+            {
+                return Unauthorized();
+            }
+            ViewData["FullName"] = me.Name;
+            ViewData["Initials"] = Utils.Initials(me.Name);
+            ViewData["Email"] = me.Email;
+            response = await client.GetAsync("auth/valid");
             if(response.StatusCode != HttpStatusCode.OK)
             {
                 return RedirectToAction("Index", "Login");

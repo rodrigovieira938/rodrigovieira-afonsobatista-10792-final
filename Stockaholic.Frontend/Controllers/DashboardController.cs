@@ -42,7 +42,19 @@ public class DashboardController : Controller
         
         try
         {
-            var response = await client.GetAsync("produtos/numero");
+            var response = await client.GetAsync("auth/me");
+            response.EnsureSuccessStatusCode();
+            var me = await response.Content.ReadFromJsonAsync<MeResult>();
+
+            if(me == null)
+            {
+                return Unauthorized();
+            }
+            ViewData["FullName"] = me.Name;
+            ViewData["Initials"] = Utils.Initials(me.Name);
+            ViewData["Email"] = me.Email;
+
+            response = await client.GetAsync("produtos/numero");
             response.EnsureSuccessStatusCode();
 
             var total_produtos = await response.Content.ReadFromJsonAsync<int>();

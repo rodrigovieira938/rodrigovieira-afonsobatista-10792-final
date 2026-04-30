@@ -48,7 +48,7 @@ namespace Stockaholic.API.Controllers
             if(userId == null || email == null)
                 return Unauthorized();
 
-            return Ok(new MeResult{ Id=int.Parse(userId), Email=email??"" });
+            return Ok(new MeResult{ Id=int.Parse(userId), Name=_context.Utilizadores.FirstOrDefault(u => u.Email == email).Nome, Email=email??"" });
         }
         [HttpGet("valid")]
         [Authorize]

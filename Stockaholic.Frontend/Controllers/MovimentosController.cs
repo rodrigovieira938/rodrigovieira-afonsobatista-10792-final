@@ -102,14 +102,25 @@ public class MovimentosController : Controller
         {
             var _response = await client.GetAsync("/auth/me");
             _response.EnsureSuccessStatusCode();
-            var me = await _response.Content.ReadFromJsonAsync<MeResult>();
-            movimento.utilizadorId = me.Id;
+            var _me = await _response.Content.ReadFromJsonAsync<MeResult>();
+            movimento.utilizadorId = _me.Id;
         } catch
         {
             return Unauthorized();
         }
 
-        var response = await client.PutAsJsonAsync($"/movimentos/{id}", movimento);
+        var response = await client.GetAsync("auth/me");
+        response.EnsureSuccessStatusCode();
+        var me = await response.Content.ReadFromJsonAsync<MeResult>();
+
+        if(me == null)
+        {
+            return Unauthorized();
+        }
+        ViewData["FullName"] = me.Name;
+        ViewData["Initials"] = Utils.Initials(me.Name);
+        ViewData["Email"] = me.Email;
+        response = await client.PutAsJsonAsync($"/movimentos/{id}", movimento);
         if(response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.NoContent) {
             return Ok();
         } else

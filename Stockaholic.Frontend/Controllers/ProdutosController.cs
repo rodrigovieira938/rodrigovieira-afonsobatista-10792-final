@@ -39,7 +39,18 @@ public class ProdutosController : Controller
         
         try
         {
-            var response = await client.GetAsync("/movimentos/stock");
+            var response = await client.GetAsync("auth/me");
+            response.EnsureSuccessStatusCode();
+            var me = await response.Content.ReadFromJsonAsync<MeResult>();
+
+            if(me == null)
+            {
+                return Unauthorized();
+            }
+            ViewData["FullName"] = me.Name;
+            ViewData["Initials"] = Utils.Initials(me.Name);
+            ViewData["Email"] = me.Email;
+            response = await client.GetAsync("/movimentos/stock");
             response.EnsureSuccessStatusCode();
             var stock = await response.Content.ReadFromJsonAsync<List<ProdutoStock>>();
 
