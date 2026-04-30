@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Stockaholic.API.Cache;
 using Stockaholic.API.Data;
 using Stockaholic.API.Models;
 
@@ -11,25 +12,37 @@ namespace Stockaholic.API.Controllers
     public class ProdutosController : ControllerBase
     {
         private readonly StockaholicDbContext _context;
-        public ProdutosController(StockaholicDbContext context)
+        private readonly CacheService _cacheService;
+
+        public ProdutosController(StockaholicDbContext context, CacheService cacheService)
         {
             _context = context;
+            _cacheService = cacheService;
         }
 
         [HttpGet]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<Produto>))]
-        public ActionResult<IEnumerable<Produto>> Get()
+        public async Task<ActionResult<IEnumerable<Produto>>> Get()
         {
-            return Ok(_context.Produtos.ToList());
+            var produtos = await _cacheService.GetOrSetAsync(
+                "produtos:all",
+                async () => await _context.Produtos.ToListAsync(),
+                TimeSpan.FromMinutes(5)
+            );
+            return Ok(produtos);
         }
         [HttpGet("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(Produto))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type=typeof(NotFoundResult))]
-        public ActionResult<Produto> Get(int id)
+        public async Task<ActionResult<Produto>> Get(int id)
         {
-            var produto = _context.Produtos.Find(id);
+            var produto = await _cacheService.GetOrSetAsync(
+                $"produtos:{id}",
+                async () => await _context.Produtos.FindAsync(id).AsTask(),
+                TimeSpan.FromMinutes(5)
+            );
             if (produto == null)
             {
                 return NotFound();
@@ -39,33 +52,42 @@ namespace Stockaholic.API.Controllers
         [HttpGet("numero")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(int))]
-        public ActionResult<int> Count()
+        public async Task<ActionResult<int>> Count()
         {
-            return Ok(_context.Produtos.Count());
+            var count = await _cacheService.GetOrSetAsync(
+                "produtos:count",
+                async () => await _context.Produtos.CountAsync(),
+                TimeSpan.FromMinutes(5)
+            );
+            return Ok(count);
         }
         [HttpGet("valor")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(double))]
-        public ActionResult<double> Value()
+        public async Task<ActionResult<double>> Value()
         {
-            var value = _context.Movimentos.GroupBy(m => m.ProdutoId)
-                .Select(g => new
-                {
-                    ProdutoId = g.Key,
-                    Quantidade = g.Sum(m => m.Delta)
-                })
-                .Join(_context.Produtos, m => m.ProdutoId, p => p.Id, (m, p) => new
-                {
-                    Valor = p.Preco * m.Quantidade
-                })
-                .Sum(x => x.Valor);
+            var value = await _cacheService.GetOrSetAsync(
+                "produtos:value",
+                async () => await _context.Movimentos.GroupBy(m => m.ProdutoId)
+                    .Select(g => new
+                    {
+                        ProdutoId = g.Key,
+                        Quantidade = g.Sum(m => m.Delta)
+                    })
+                    .Join(_context.Produtos, m => m.ProdutoId, p => p.Id, (m, p) => new
+                    {
+                        Valor = p.Preco * m.Quantidade
+                    })
+                    .SumAsync(x => x.Valor),
+                TimeSpan.FromMinutes(5)
+            );
             return Ok(value);
         }
 
         [HttpPost]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created, Type=typeof(Produto))]
-        public ActionResult<Produto> Post([FromBody] CreateProduto createProduto)
+        public async Task<ActionResult<Produto>> Post([FromBody] CreateProduto createProduto)
         {
             var produto = new Produto
             {
@@ -74,60 +96,73 @@ namespace Stockaholic.API.Controllers
                 Preco = createProduto.Preco
             };
             _context.Produtos.Add(produto);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+            InvalidateProdutoCache(produto.Id);
             return CreatedAtAction(nameof(Get), new { id = produto.Id }, produto);
         }
         [HttpPut("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type=typeof(BadRequestResult))]
-        public ActionResult<Produto> Put(int id, [FromBody] CreateProduto produto)
+        public async Task<ActionResult<Produto>> Put(int id, [FromBody] CreateProduto produto)
         {
-            var _produto = new Produto {
+            var updatedProduto = new Produto
+            {
                 Id = id,
                 Nome = produto.Nome,
                 CategoriaId = produto.CategoriaId,
                 Preco = produto.Preco
             };
-            _context.Entry(_produto).State = EntityState.Modified;
-            _context.SaveChanges();
+            _context.Entry(updatedProduto).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            InvalidateProdutoCache(id);
             return NoContent();
         }
         [HttpPatch("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type=typeof(NotFoundResult))]
-        public ActionResult<Produto> Patch(int id, [FromBody] ProdutoPatch input)
+        public async Task<ActionResult<Produto>> Patch(int id, [FromBody] ProdutoPatch input)
         {
-            var produto = _context.Produtos.Find(id);
+            var produto = await _context.Produtos.FindAsync(id);
             if (produto == null)
                 return NotFound();
 
             if (input.Nome != null)
                 produto.Nome = input.Nome;
-            if (input.CategoriaId != null)
+            if (input.CategoriaId.HasValue)
                 produto.CategoriaId = input.CategoriaId.Value;
-            if (input.Preco != null)
+            if (input.Preco.HasValue)
                 produto.Preco = input.Preco.Value;
 
-
             _context.Entry(produto).State = EntityState.Modified;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+            InvalidateProdutoCache(id);
             return NoContent();
         }
         [HttpDelete("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type=typeof(NotFoundResult))]
-        public ActionResult<Produto> Delete(int id)
+        public async Task<ActionResult<Produto>> Delete(int id)
         {
-            var produto = _context.Produtos.Find(id);
+            var produto = await _context.Produtos.FindAsync(id);
             if (produto == null)
                 return NotFound();
 
             _context.Produtos.Remove(produto);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+            InvalidateProdutoCache(id);
             return NoContent();
+        }
+
+        private void InvalidateProdutoCache(int id)
+        {
+            _cacheService.Remove("produtos:all");
+            _cacheService.Remove("movimentos:stock");
+            _cacheService.Remove("produtos:count");
+            _cacheService.Remove("produtos:value");
+            _cacheService.Remove($"produtos:{id}");
         }
     }
 }
