@@ -152,7 +152,7 @@
       const q = document.getElementById('search').value.toLowerCase();
       return utilizadores.filter(u => {
         const mq = u.nome.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
-        return mq && mr;
+        return mq;
       });
     }
 
