@@ -25,6 +25,9 @@ CREATE TABLE IF NOT EXISTS utilizadores (
     password_salt text NOT NULL
 );
 
+INSERT INTO utilizadores (nome, email, password_hash, password_salt)
+VALUES ('Administrator', 'admin@admin.com', 'MyaJz8gIjvqx+Fg7y8C8O41bgTPsfXfumE4B9pggDqM=', 'lHKlxBHmYrhv9dnZgE2WEg==');
+
 -- Table: movimentos
 CREATE TABLE IF NOT EXISTS movimentos (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

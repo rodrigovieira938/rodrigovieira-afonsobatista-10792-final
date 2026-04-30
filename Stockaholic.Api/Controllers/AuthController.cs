@@ -22,6 +22,7 @@ namespace Stockaholic.API.Controllers
             _tokenService = tokenService;
         }
         [HttpPost("login")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(LoginResult))]
         public ActionResult<LoginResult> Login([FromBody] LoginInput input)
         {

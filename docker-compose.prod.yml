@@ -17,7 +17,7 @@ services:
     restart: always
     command: redis-server --save 20 1 --loglevel warning --requirepass prodpass
     volumes:
-      - cache:/data
+      - prod-cache:/data
     networks:
       - stockaholic_net
   mountebank:
@@ -45,10 +45,25 @@ services:
       - "4343:4343"
     networks:
       - stockaholic_net
+  frontend:
+    build:
+      context: ./Stockaholic.Frontend
+      dockerfile: Dockerfile
+    image: stockaholic-frontend:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    ports:
+      - "5018:5018"
+      - "5019:5019"
+    networks:
+      - stockaholic_net
 
 volumes:
   db_prod_data:
-  cache:
+  prod-cache:
     driver: local
 networks:
   stockaholic_net:

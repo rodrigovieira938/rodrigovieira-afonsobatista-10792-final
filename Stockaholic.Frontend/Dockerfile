@@ -1,38 +1,33 @@
 
-# Multi-stage build for Stockaholic.Api
+# Multi-stage build for Stockaholic.Frontend
 # Build stage: restore, build and publish
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore dependencies (leverage Docker layer caching)
-COPY ["Stockaholic.Api.csproj", "./"]
-RUN dotnet restore "Stockaholic.Api.csproj"
+COPY ["Stockaholic.Frontend.csproj", "./"]
+RUN dotnet restore "Stockaholic.Frontend.csproj"
 
 # Generate self-signed HTTPS certificate for the runtime container
 RUN mkdir /https && dotnet dev-certs https -ep /https/aspnetapp.pfx -p SecurePwd!123
 
 # Copy remaining sources and publish
 COPY . ./
-RUN dotnet publish "Stockaholic.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Stockaholic.Frontend.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
-
-# Install runtime dependency for GSSAPI/Kerberos support required by libpq/Npgsql and related libraries
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends libgssapi-krb5-2 \
-    && rm -rf /var/lib/apt/lists/*
 
 # Copy published app and certificate from build stage
 COPY --from=build /app/publish ./
 COPY --from=build /https /https
 
 # Listen on HTTP and HTTPS inside the container
-ENV ASPNETCORE_HTTP_PORTS=8000
-ENV ASPNETCORE_HTTPS_PORTS=4343
+ENV ASPNETCORE_HTTP_PORTS=5018
+ENV ASPNETCORE_HTTPS_PORTS=5019
 ENV ASPNETCORE_Kestrel__Certificates__Default__Password=SecurePwd!123
 ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-EXPOSE 8000 4343
+EXPOSE 5018 5019
 
-ENTRYPOINT ["dotnet", "Stockaholic.Api.dll"]
+ENTRYPOINT ["dotnet", "Stockaholic.Frontend.dll"]
