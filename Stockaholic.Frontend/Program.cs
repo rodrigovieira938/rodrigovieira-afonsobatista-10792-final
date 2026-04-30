@@ -29,8 +29,21 @@ builder.Services.AddHttpClient("ApiClient", client =>
         options.Retry.Delay = TimeSpan.FromSeconds(2);
         options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(60);
         options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(15);
+    });
+builder.Services.AddHttpClient("ResetPasswordApiClient", client =>
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:ResetPasswordImposter"]!))
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback = 
+        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
     })
-    ;
+    .AddStandardResilienceHandler(options =>
+    {
+        options.Retry.MaxRetryAttempts = 3;
+        options.Retry.Delay = TimeSpan.FromSeconds(2);
+        options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(60);
+        options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(15);
+    });
 
 var app = builder.Build();
 

@@ -2,6 +2,8 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Stockaholic.Frontend.Models;
+using System.Text.Json;
+using System.Net.Http.Json;
 
 namespace Stockaholic.Frontend.Controllers;
 
@@ -56,6 +58,24 @@ public class LoginController : Controller
         {
             _logger.LogError(ex, "Failed attempted login attempt! email={}", request.email);
             return Unauthorized();
+        }
+    }
+    [HttpPost("/forgot-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        var client = _clientFactory.CreateClient("ResetPasswordApiClient");
+        try
+        {
+            var response = await client.PostAsJsonAsync("/reset-password", request);
+            response.EnsureSuccessStatusCode();
+            var res = await response.Content.ReadFromJsonAsync<ForgotPasswordResponse>();
+            return Ok(res);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while fetching products");
+            return StatusCode(500, "Internal Server Error");
         }
     }
 }
