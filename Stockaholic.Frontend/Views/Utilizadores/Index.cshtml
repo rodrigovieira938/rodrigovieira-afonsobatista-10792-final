@@ -1,4 +1,5 @@
-﻿@{
+﻿@model ViewUtilizador
+@{
     ViewData["Title"] = "Utilizadores";
 }
 
@@ -47,8 +48,6 @@
                 style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Utilizador</th>
               <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
                 style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Email</th>
-              <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
-                style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Papel</th>
               </th>
               <th class="px-4 py-3 text-left font-mono text-muted uppercase tracking-wider"
                 style="font-size:10px; font-weight:400; border-bottom:1px solid rgba(255,255,255,0.07)">Ações</th>
@@ -144,28 +143,15 @@
     ];
 
     let utilizadores = [
-      { id: 1, nome: 'Admin', email: 'admin@stock.io', role: 'Admin' },
-      { id: 2, nome: 'João Silva', email: 'joao@stock.io', role: 'Operador' },
-      { id: 3, nome: 'Maria Costa', email: 'maria@stock.io', role: 'Operador' },
-      { id: 4, nome: 'Pedro Santos', email: 'pedro@stock.io', role: 'Operador' },
-      { id: 5, nome: 'Ana Ferreira', email: 'ana@stock.io', role: 'Operador' },
-      { id: 6, nome: 'Rui Lopes', email: 'rui@stock.io', role: 'Operador' },
+      @foreach(var user in @Model.utilizadores) {
+        <text>{id:@user.Id, nome:"@user.Nome", email:"@user.Email"}</text>
+      }
     ];
 
     let nextId = 7, page = 1, perPage = 8, delTarget = null;
 
     function initials(nome) { return nome.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase(); }
     function avatarStyle(id) { const s = avatarColors[(id - 1) % avatarColors.length]; return `background:${s.bg}; color:${s.color}`; }
-
-    function formatDate(d) {
-      const now = new Date(); now.setHours(0, 0, 0, 0);
-      const dd = new Date(d); dd.setHours(0, 0, 0, 0);
-      const diff = Math.round((now - dd) / 86400000);
-      if (diff === 0) return 'Hoje';
-      if (diff === 1) return 'Ontem';
-      if (diff < 7) return `${diff} dias atrás`;
-      return d.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' });
-    }
 
     function filtered() {
       const q = document.getElementById('search').value.toLowerCase();
@@ -200,7 +186,6 @@
             </div>
           </td>
           <td class="px-4 py-3 font-mono text-muted text-xs">${u.email}</td>
-          <td class="px-4 py-3"><span class="font-mono px-2 py-0.5 rounded text-xs">${u.role}</span></td>
           <td class="px-4 py-3">
             <div class="flex gap-2">
               <button onclick="editUtilizador(${u.id})" class="px-2.5 py-1 rounded-md text-xs font-mono" style="background:#1e2334; border:1px solid rgba(255,255,255,0.07); color:#e8eaf0">editar</button>
@@ -260,12 +245,39 @@
       const pwd2 = document.getElementById('f-pwd2').value;
 
       if (!nome || !email) return;
+      if(pwd != pwd2 && pwd != null) {
+        alert("Passwords têm que coincidir")
+      }
 
       if (id) {
         const u = utilizadores.find(u => u.id == id);
         Object.assign(u, { nome, email });
+        fetch(`/utilizadores/${id}`, {
+          method: "PATCH",
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, email })
+        }).then(res => {
+          if(res.ok) {
+            Object.assign(p, { nome, email});
+            closeModal();
+            renderTable();
+          } else {
+            alert('Erro ao atualizar utilizador');
+          }
+        })
       } else {
         utilizadores.push({ id: nextId++, nome, email,});
+        fetch("/utilizadores", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ "nome":nome, "email":email, "password":pwd})
+        }).then(res => {
+          if (res.ok) {
+            location.reload()
+          } else {
+            alert('Erro ao criar utilizador');
+           }
+        });
       }
       closeModal(); renderTable();
     }
@@ -277,7 +289,15 @@
       document.getElementById('del-modal').classList.remove('hidden');
     }
     function closeDelModal() { document.getElementById('del-modal').classList.add('hidden'); delTarget = null; }
-    function confirmDelete() { utilizadores = utilizadores.filter(u => u.id !== delTarget); closeDelModal(); renderTable(); }
+    function confirmDelete() { 
+      fetch(`/utilizadores/${delTarget}`, { method: 'DELETE' }).then(res => {
+          if (res.ok) {
+            location.reload();
+          } else {           
+            alert('Erro ao eliminar produto');
+          }      
+        });
+    }
 
     renderTable();
   </script>

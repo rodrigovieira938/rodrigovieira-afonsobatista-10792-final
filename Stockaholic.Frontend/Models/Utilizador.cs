@@ -1,0 +1,11 @@
+using System;
+
+namespace Stockaholic.Frontend.Models;
+public class Utilizador
+{
+    public int Id { get; set; }
+    public string Nome { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public string PasswordSalt { get; set; } = null!;
+    public string PasswordHash { get; set; } = null!;
+}
