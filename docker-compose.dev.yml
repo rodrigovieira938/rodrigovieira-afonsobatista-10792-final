@@ -12,6 +12,15 @@ services:
       - ./scripts/postgres_init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
-
+  cache:
+    image: redis:7.4-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning --requirepass devpass
+    volumes:
+      - cache:/data
 volumes:
   db_dev_data:
+  cache:
+    driver: local

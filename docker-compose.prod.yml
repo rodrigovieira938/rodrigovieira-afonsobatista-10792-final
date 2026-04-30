@@ -12,6 +12,14 @@ services:
       - ./scripts/postgres_init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - stockaholic_net
+  cache:
+    image: redis:7.4-alpine
+    restart: always
+    command: redis-server --save 20 1 --loglevel warning --requirepass prodpass
+    volumes:
+      - cache:/data
+    networks:
+      - stockaholic_net
 
   api:
     build:
@@ -31,7 +39,8 @@ services:
 
 volumes:
   db_prod_data:
-
+  cache:
+    driver: local
 networks:
   stockaholic_net:
     driver: bridge

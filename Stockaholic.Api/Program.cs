@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Stockaholic.API.Auth;
+using Stockaholic.API.Cache;
 using Stockaholic.API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +35,13 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddSingleton<TokenService>();
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "Stockaholid";
+});
+
+builder.Services.AddSingleton<CacheService>();
 
 builder.Services.AddCors(options =>
 {
