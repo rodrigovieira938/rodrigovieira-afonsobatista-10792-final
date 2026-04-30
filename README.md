@@ -22,6 +22,8 @@ Open http://localhost:8080/swagger - for the api documentation
 
 Open http://localhost:5018 - for the frontend
 
+Login as "admin@admin.com" with password "123" 
+
 Now you're ready to start stocking
 
 ### Prod mode
@@ -30,5 +32,7 @@ docker compose -f docker-compose.prod.yml up -d
 ```
 
 Open http://localhost:5018 - for the frontend
+
+Login as "admin@admin.com" with password "123" 
 
 Now you're ready to start stocking
