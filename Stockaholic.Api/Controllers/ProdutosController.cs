@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Stockaholic.API.Data;
@@ -16,12 +17,14 @@ namespace Stockaholic.API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<Produto>))]
         public ActionResult<IEnumerable<Produto>> Get()
         {
             return Ok(_context.Produtos.ToList());
         }
         [HttpGet("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(Produto))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type=typeof(NotFoundResult))]
         public ActionResult<Produto> Get(int id)
@@ -34,12 +37,14 @@ namespace Stockaholic.API.Controllers
             return Ok(produto);
         }
         [HttpGet("numero")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(int))]
         public ActionResult<int> Count()
         {
             return Ok(_context.Produtos.Count());
         }
         [HttpGet("valor")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(double))]
         public ActionResult<double> Value()
         {
@@ -58,6 +63,7 @@ namespace Stockaholic.API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created, Type=typeof(Produto))]
         public ActionResult<Produto> Post([FromBody] CreateProduto createProduto)
         {
@@ -72,6 +78,7 @@ namespace Stockaholic.API.Controllers
             return CreatedAtAction(nameof(Get), new { id = produto.Id }, produto);
         }
         [HttpPut("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type=typeof(BadRequestResult))]
         public ActionResult<Produto> Put(int id, [FromBody] CreateProduto produto)
@@ -87,6 +94,7 @@ namespace Stockaholic.API.Controllers
             return NoContent();
         }
         [HttpPatch("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type=typeof(NotFoundResult))]
         public ActionResult<Produto> Patch(int id, [FromBody] ProdutoPatch input)
@@ -108,6 +116,7 @@ namespace Stockaholic.API.Controllers
             return NoContent();
         }
         [HttpDelete("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type=typeof(NotFoundResult))]
         public ActionResult<Produto> Delete(int id)

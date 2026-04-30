@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Stockaholic.API.Data;
@@ -18,12 +19,14 @@ namespace Stockaholic.API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<Utilizador>))]
         public ActionResult<IEnumerable<Utilizador>> Get()
         {
             return Ok(_context.Utilizadores.ToList());
         }
         [HttpGet("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(Utilizador))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type=typeof(NotFoundResult))]
         public ActionResult<Utilizador> Get(int id)
@@ -36,6 +39,7 @@ namespace Stockaholic.API.Controllers
             return Ok(utilizador);
         }
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created, Type=typeof(Utilizador))]
         public ActionResult<Utilizador> Post([FromBody] CreateUtilizador createUtilizador)
         {
@@ -59,6 +63,7 @@ namespace Stockaholic.API.Controllers
             return CreatedAtAction(nameof(Get), new { id = utilizador.Id }, utilizador);
         }
         [HttpPut("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type=typeof(BadRequestResult))]
         public ActionResult<Utilizador> Put(int id, [FromBody] Utilizador utilizador)
@@ -72,6 +77,7 @@ namespace Stockaholic.API.Controllers
             return NoContent();
         }
         [HttpPatch("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type=typeof(NotFoundResult))]
         public ActionResult<Utilizador> Patch(int id, [FromBody] UtilizadorPatch input)
@@ -94,6 +100,7 @@ namespace Stockaholic.API.Controllers
             return NoContent();
         }
         [HttpDelete("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type=typeof(NotFoundResult))]
         public ActionResult<Utilizador> Delete(int id)

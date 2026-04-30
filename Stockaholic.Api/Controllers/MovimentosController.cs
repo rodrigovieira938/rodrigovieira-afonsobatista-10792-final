@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Stockaholic.API.Data;
@@ -16,12 +17,14 @@ namespace Stockaholic.API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<Movimento>))]
         public ActionResult<IEnumerable<Movimento>> Get()
         {
             return Ok(_context.Movimentos.ToList());
         }
         [HttpGet("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(Movimento))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type=typeof(NotFoundResult))]
         public ActionResult<Movimento> Get(int id)
@@ -34,6 +37,7 @@ namespace Stockaholic.API.Controllers
             return Ok(movimento);
         }
         [HttpGet("recentes")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<Movimento>))]
         public ActionResult<IEnumerable<Movimento>> GetRecentes()
         {
@@ -44,6 +48,7 @@ namespace Stockaholic.API.Controllers
             return Ok(recentes);
         }
         [HttpGet("hoje")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<Movimento>))]
         public ActionResult<IEnumerable<Movimento>> GetHoje()
         {            var hoje = DateTime.UtcNow.Date;
@@ -53,6 +58,7 @@ namespace Stockaholic.API.Controllers
             return Ok(movimentosHoje);
         }
         [HttpGet("stock")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<ProdutoStock>))]
         public async Task<ActionResult<IEnumerable<ProdutoStock>>> GetStock()
         {
@@ -81,6 +87,7 @@ namespace Stockaholic.API.Controllers
             return Ok(produtosStock);
         }
         [HttpGet("top-valor")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(IEnumerable<ProdutoStock>))]
         public ActionResult<IEnumerable<ProdutoStock>> GetTopValor()
         {
@@ -100,6 +107,7 @@ namespace Stockaholic.API.Controllers
             return Ok(res);
         }
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created, Type=typeof(Movimento))]
         public ActionResult<Movimento> Post([FromBody] CreateMovimento createMovimento)
         {
@@ -117,6 +125,7 @@ namespace Stockaholic.API.Controllers
             return CreatedAtAction(nameof(Get), new { id = movimento.Id }, movimento);
         }
         [HttpPut("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type=typeof(BadRequestResult))]
         public ActionResult<Movimento> Put(int id, [FromBody] PutMovimento movimento)
@@ -139,6 +148,7 @@ namespace Stockaholic.API.Controllers
             return NoContent();
         }
         [HttpPatch("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type=typeof(NotFoundResult))]
         public ActionResult<Movimento> Patch(int id, [FromBody] MovimentoPatch input)
@@ -165,6 +175,7 @@ namespace Stockaholic.API.Controllers
             return NoContent();
         }
         [HttpDelete("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type=typeof(NotFoundResult))]
         public ActionResult<Movimento> Delete(int id)
