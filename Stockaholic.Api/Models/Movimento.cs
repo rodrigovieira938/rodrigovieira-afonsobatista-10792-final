@@ -25,6 +25,16 @@ namespace Stockaholic.API.Models
         [JsonIgnore]
         public Utilizador Utilizador { get; set; } = null!;
     }
+    public class PutMovimento
+    {
+        public int Id { get; set; }
+        public string Nome { get; set; } = null!;
+        public DateTime Timestamp { get; set; }
+        public int ProdutoId { get; set; }
+        public int Delta { get; set; }
+        public string? descricao { get; set; }
+        public int UtilizadorId { get; set; }
+    }
 
     public class MovimentoPatch
     {

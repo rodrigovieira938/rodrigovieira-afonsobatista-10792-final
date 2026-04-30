@@ -119,13 +119,22 @@ namespace Stockaholic.API.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent, Type=typeof(NoContentResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type=typeof(BadRequestResult))]
-        public ActionResult<Movimento> Put(int id, [FromBody] Movimento movimento)
+        public ActionResult<Movimento> Put(int id, [FromBody] PutMovimento movimento)
         {
             if (id != movimento.Id)
             {
                 return BadRequest("O ID da URL deve ser igual ao ID do corpo da requisição.");
             }
-            _context.Entry(movimento).State = EntityState.Modified;
+            _context.Entry(new Movimento
+            {
+                Id=movimento.Id,
+                Nome=movimento.Nome,
+                Timestamp=movimento.Timestamp,
+                ProdutoId=movimento.ProdutoId,
+                Delta=movimento.Delta,
+                descricao=movimento.descricao,
+                UtilizadorId=movimento.UtilizadorId,
+            }).State = EntityState.Modified;
             _context.SaveChanges();
             return NoContent();
         }
