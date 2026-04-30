@@ -1,3 +1,6 @@
+using System.Net;
+using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Stockaholic.Frontend.Models;
@@ -16,7 +19,25 @@ public class MovimentosController : Controller
     }
     public async Task<IActionResult> Index()
     {
+        string? token = Request.Cookies["auth_token"];
+        if(token == null)
+        {
+            return RedirectToAction("Index", "Login");
+        }
         var client = _clientFactory.CreateClient("ApiClient");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        
+        try
+        {
+            var _response = await client.GetAsync("auth/valid");
+            if(_response.StatusCode != HttpStatusCode.OK)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        } catch(Exception)
+        {
+            return RedirectToAction("Index", "Login");
+        }
 
         try
         {
@@ -69,9 +90,25 @@ public class MovimentosController : Controller
     [HttpPut("/movimentos/{id}")]
     public async Task<IActionResult> Put(int id, [FromBody] Movimento movimento)
     {
-        movimento.utilizadorId = 3; //TODO: get the id from the currentlly logged in user
-        _logger.LogInformation("Put input: {}", JsonSerializer.Serialize(movimento));
+        string? token = Request.Cookies["auth_token"];
+        if(token == null)
+        {
+            return Unauthorized();
+        }
         var client = _clientFactory.CreateClient("ApiClient");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        
+        try
+        {
+            var _response = await client.GetAsync("/auth/me");
+            _response.EnsureSuccessStatusCode();
+            var me = await _response.Content.ReadFromJsonAsync<MeResult>();
+            movimento.utilizadorId = me.Id;
+        } catch
+        {
+            return Unauthorized();
+        }
+
         var response = await client.PutAsJsonAsync($"/movimentos/{id}", movimento);
         if(response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.NoContent) {
             return Ok();
@@ -84,9 +121,25 @@ public class MovimentosController : Controller
     [HttpPost("/movimentos")]
     public async Task<IActionResult> Post([FromBody] CreateMovimento movimento)
     {
-        movimento.UtilizadorId = 3; //TODO: get the id from the currentlly logged in user
-        _logger.LogInformation("Post input: {}", JsonSerializer.Serialize(movimento));
+        string? token = Request.Cookies["auth_token"];
+        if(token == null)
+        {
+            return Unauthorized();
+        }
         var client = _clientFactory.CreateClient("ApiClient");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        
+        try
+        {
+            var _response = await client.GetAsync("/auth/me");
+            _response.EnsureSuccessStatusCode();
+            var me = await _response.Content.ReadFromJsonAsync<MeResult>();
+            movimento.UtilizadorId = me.Id;
+        } catch
+        {
+            return Unauthorized();
+        }
+
         var response = await client.PostAsJsonAsync("/movimentos", movimento);
         if(response.StatusCode == System.Net.HttpStatusCode.Created) {
             return Ok();
@@ -99,7 +152,14 @@ public class MovimentosController : Controller
     [HttpDelete("/movimentos/{id}")]
     public async Task<IActionResult> Delete(int id)
     {
+        string? token = Request.Cookies["auth_token"];
+        if(token == null)
+        {
+            return Unauthorized();
+        }
         var client = _clientFactory.CreateClient("ApiClient");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        
         var response = await client.DeleteAsync($"/movimentos/{id}");
         if(response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.NoContent) {
             return Ok();

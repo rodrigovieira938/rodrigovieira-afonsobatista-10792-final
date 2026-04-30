@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Stockaholic.Frontend.Models;
@@ -17,8 +19,27 @@ public class DashboardController : Controller
 
     public async Task<IActionResult> Index()
     {
+        string? token = Request.Cookies["auth_token"];
+        if(token == null)
+        {
+            return RedirectToAction("Index", "Login");
+        }
         var client = _clientFactory.CreateClient("ApiClient");
-
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        
+        try
+        {
+            var response = await client.GetAsync("auth/valid");
+            response.EnsureSuccessStatusCode();
+            if(response.StatusCode != HttpStatusCode.OK)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        } catch(Exception)
+        {
+            return RedirectToAction("Index", "Login");
+        }
+        
         try
         {
             var response = await client.GetAsync("produtos/numero");

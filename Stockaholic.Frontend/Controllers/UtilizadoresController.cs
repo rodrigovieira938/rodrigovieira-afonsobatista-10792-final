@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using Stockaholic.Frontend.Models;
 
@@ -16,7 +18,25 @@ public class UtilizadoresController : Controller
 
     public async Task<IActionResult> Index()
     {
+        string? token = Request.Cookies["auth_token"];
+        if(token == null)
+        {
+            return RedirectToAction("Index", "Login");
+        }
         var client = _clientFactory.CreateClient("ApiClient");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        
+        try
+        {
+            var _response = await client.GetAsync("auth/valid");
+            if(_response.StatusCode != HttpStatusCode.OK)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        } catch(Exception)
+        {
+            return RedirectToAction("Index", "Login");
+        }
 
         try
         {
@@ -41,7 +61,14 @@ public class UtilizadoresController : Controller
     [HttpPatch("/utilizadores/{id}")]
     public async Task<IActionResult> Patch(int id, [FromBody] PatchUtilizador utilizador)
     {
+        string? token = Request.Cookies["auth_token"];
+        if(token == null)
+        {
+            return Unauthorized();
+        }
         var client = _clientFactory.CreateClient("ApiClient");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
         var response = await client.PatchAsJsonAsync($"/utilizadores/{id}", utilizador);
         if(response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.NoContent) {
             return Ok();
@@ -54,7 +81,14 @@ public class UtilizadoresController : Controller
     [HttpPost("/utilizadores")]
     public async Task<IActionResult> Post([FromBody] CreateUtilizador utilizador)
     {
+        string? token = Request.Cookies["auth_token"];
+        if(token == null)
+        {
+            return Unauthorized();
+        }
         var client = _clientFactory.CreateClient("ApiClient");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        
         var response = await client.PostAsJsonAsync("/utilizadores", utilizador);
         if(response.StatusCode == System.Net.HttpStatusCode.Created) {
             return Ok();

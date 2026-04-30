@@ -139,7 +139,7 @@
 
     let utilizadores = [
       @foreach(var user in @Model.utilizadores) {
-        <text>{id:@user.Id, nome:"@user.Nome", email:"@user.Email"}</text>
+        <text>{id:@user.Id, nome:"@user.Nome", email:"@user.Email"},</text>
       }
     ];
 

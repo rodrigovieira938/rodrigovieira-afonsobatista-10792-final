@@ -280,6 +280,7 @@
       if (id) {
         body.id = id;
         fetch(`/movimentos/${id}`, {
+          credentials: "include",
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
@@ -295,6 +296,7 @@
       }
       else {
         fetch("/movimentos", {
+          credentials: "include",
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
@@ -317,7 +319,7 @@
     }
     function closeDelModal() { document.getElementById('del-modal').classList.add('hidden'); delTarget = null; }
     function confirmDelete() { 
-      fetch(`/movimentos/${delTarget}`, { method: 'DELETE' }).then(res => {
+      fetch(`/movimentos/${delTarget}`, {credentials: "include", method: 'DELETE' }).then(res => {
           if (res.ok) {
             location.reload();
           } else {           
