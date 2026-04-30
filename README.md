@@ -22,9 +22,13 @@ Open http://localhost:8080/swagger - for the api documentation
 
 Open http://localhost:5018 - for the frontend
 
+Now you're ready to start stocking
+
 ### Prod mode
 ```bash
 docker compose -f docker-compose.prod.yml up -d
 ```
 
 Open http://localhost:5018 - for the frontend
+
+Now you're ready to start stocking
