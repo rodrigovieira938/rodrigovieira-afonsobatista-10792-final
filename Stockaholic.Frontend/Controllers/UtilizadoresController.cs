@@ -101,7 +101,14 @@ public class UtilizadoresController : Controller
     [HttpDelete("/utilizadores/{id}")]
     public async Task<IActionResult> Delete(int id)
     {
+        string? token = Request.Cookies["auth_token"];
+        if(token == null)
+        {
+            return Unauthorized();
+        }
         var client = _clientFactory.CreateClient("ApiClient");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        
         var response = await client.DeleteAsync($"/utilizadores/{id}");
         if(response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.NoContent) {
             return Ok();
